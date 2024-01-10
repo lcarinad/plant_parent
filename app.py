@@ -16,3 +16,8 @@ connect_db(app)
 def show_homepage():
     """Show landing page"""
     return render_template("home.html")
+
+@app.route("/signup",methods=['POST, GET'])
+def signup():
+    """Show landing page"""
+    return render_template("signup.html")
