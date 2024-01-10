@@ -2,6 +2,8 @@ from flask import Flask, request, render_template
 from models import db, connect_db
 
 app= Flask(__name__)
+app.app_context().push()
+
 app.config['SECRET_KEY']='oh-so-secret'
 app.config['SQLALCHEMY_DATABASE_URI']='postgresql:///plant_db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False

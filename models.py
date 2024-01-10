@@ -17,6 +17,15 @@ class User(db.Model):
     password=db.Column(db.String, nullable=False)
     favorites = db.relationship('Plant', secondary='users_favorites', backref='users')
 
+    pref_indoor = db.Column(db.Boolean)
+    pref_sunlight= db.Column(db.String)
+    pref_watering=db.Column(db.String)
+    pref_edible=db.Column(db.Boolean)
+    def __repr__(self):
+        """Show info about user"""
+        u=self
+        return f"<User {u.id} {u.username}>"
+
 class Plant(db.Model):
     """Plant table"""
 
@@ -26,6 +35,11 @@ class Plant(db.Model):
     name=db.Column(db.String, nullable=False)
     image_url=db.Column(db.String)
 
+    def __repr__(self):
+        """Show info about a plant"""
+        p=self
+        return f"<Plant_id:{p.id} Plant_api_id:{p.api_id} Name:{p.name}>"
+    
 class Favorite(db.Model):
     """User favorite plants table"""
 
