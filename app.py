@@ -11,3 +11,8 @@ app.config['SQLALCHEMY_ECHO'] = True
 
 
 connect_db(app)
+
+@app.route("/")
+def show_homepage():
+    """Show landing page"""
+    return render_template("home.html")
