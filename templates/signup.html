@@ -1,0 +1,35 @@
+{% extends 'base.html' %} {% block title %}Sign Up🌿{% endblock %} {% block
+content %}
+
+<div class="h1 mt-2 text-center">We are going to need some info mom!</div>
+
+<form method="post">
+  {{ form.hidden_tag() }} {% for field in form if field.widget.input_type !=
+  'hidden' %} {% for error in field.errors %}
+  <span class="text-danger">{{ error }}</span>
+  {% endfor %}
+
+  <div class="form-group">
+    {{ field.label }} {% if field.type == 'RadioField' %} {% for choice in field
+    %}
+    <div class="form-check">
+      {{choice(class_="form-check-input")}} {{
+      choice.label(class_="form-check-label") }}
+    </div>
+    {% endfor %} {% elif field.type == 'BooleanField' %}
+    <div class="form-check">
+      <input
+        type="checkbox"
+        class="form-check-input"
+        id="{{ field.id }}"
+        name="{{ field.name }}"
+      />
+      <label class="form-check-label" for="{{ field.id }}"></label>
+    </div>
+    {% else %} {{ field(class_="form-control") }} {% endif %}
+  </div>
+  {% endfor %}
+  <button class="btn btn-primary">Submit</button>
+</form>
+
+{% endblock %}
