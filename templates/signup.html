@@ -1,13 +1,13 @@
 {% extends 'base.html' %} {% block title %}Sign Up🌿{% endblock %} {% block
 content %}
 
-<div class="h1 mt-2 text-center">We are going to need some info mom!</div>
+<div class="h1 mt-2 text-center">We are going to need some info!</div>
 
 <form method="post">
   {{ form.hidden_tag() }} {% for field in form if field.widget.input_type !=
-  'hidden' %} {% for error in field.errors %}
-  <span class="text-danger">{{ error }}</span>
-  {% endfor %}
+  'hidden' %}{% if field.errors %} {% for error in field.errors %}
+  <div class="text-warning">{{ error }}</div>
+  {% endfor %} {% endif %}
 
   <div class="form-group">
     {{ field.label }} {% if field.type == 'RadioField' %} {% for choice in field
