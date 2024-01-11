@@ -1,5 +1,6 @@
 from flask import Flask, request, render_template, flash, redirect
-from models import db, connect_db
+from sqlalchemy.exc import IntegrityError
+from models import db, connect_db, User
 from forms import SignupForm
 app= Flask(__name__)
 app.app_context().push()
@@ -23,14 +24,17 @@ def signup():
     form = SignupForm()
 
     if form.validate_on_submit():
-        username=form.username.data
-        email = form.email.data
-        password=form.password.data
-        pref_indoor=form.pref_indoor.data
-        pref_edible=form.pref_edible.data
-        pref_sunlight=form.pref_sunlight.data
-        pref_watering=form.pref_watering.data
-        flash(f"Welcome to the family {username}", 'success')
-        return redirect("/")
+        try:
+            user=User.signup(
+            username=form.username.data,
+            email = form.email.data,
+            password=form.password.data)
+            db.session.commit()
+
+            flash(f"Welcome to the family {user.username}", 'success')
+            return redirect("/")
+        
+        except IntegrityError:
+            flash("Username already taken", 'danger')
     else:
-        return render_template("signup.html", form=form)
+        return render_template('signup.html', form=form)

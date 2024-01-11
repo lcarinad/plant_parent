@@ -1,5 +1,9 @@
 from flask_sqlalchemy import SQLAlchemy
+from flask_bcrypt import Bcrypt
+
 db = SQLAlchemy()
+
+bcrypt=Bcrypt()
 
 def connect_db(app):
     """Connect to database."""
@@ -16,15 +20,25 @@ class User(db.Model):
     email=db.Column(db.String,nullable=False, unique=True)
     password=db.Column(db.String, nullable=False)
     favorites = db.relationship('Plant', secondary='users_favorites', backref='users')
-
     pref_indoor = db.Column(db.Boolean)
     pref_sunlight= db.Column(db.String)
     pref_watering=db.Column(db.String)
     pref_edible=db.Column(db.Boolean)
+
     def __repr__(self):
         """Show info about user"""
         u=self
         return f"<User {u.id} {u.username}>"
+    
+    @classmethod
+    def signup(cls, username, password, email):
+        """Sign up user.  Hashes password and adds user to system"""
+
+        hashed_pwd=bcrypt.generate_password_hash(password).decode('utf-8')
+        user = User(username=username,password=hashed_pwd, email=email )
+
+        db.session.add(user)
+        return user
 
 class Plant(db.Model):
     """Plant table"""
