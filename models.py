@@ -26,7 +26,7 @@ class User(db.Model):
     pref_edible=db.Column(db.Boolean)
 
     def __repr__(self):
-        """Show info about user"""
+        """Show info about user."""
         u=self
         return f"<User {u.id} {u.username}>"
     
@@ -39,6 +39,17 @@ class User(db.Model):
 
         db.session.add(user)
         return user
+    
+    @classmethod
+    def authenticate(cls, username, password):
+        """Find user with un and hashed pwd. Returns user object if username and hashed pwd are found, else returns False."""
+        user = cls.query.filter_by(username=username).first()
+
+        if user:
+            auth_check=bcrypt.check_password_hash(user.password, password)
+            if auth_check:
+                return user
+            return False
 
 class Plant(db.Model):
     """Plant table"""

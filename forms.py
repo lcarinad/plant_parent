@@ -8,6 +8,10 @@ class SignupForm(FlaskForm):
     password = PasswordField("Password", validators=[InputRequired("A valid password is required")])
     email = StringField("Email", validators=[InputRequired(), Email("Email is required")])
 
+class LoginForm(FlaskForm):
+    username = StringField("User Name", validators=[InputRequired("A username is required")])
+    password = PasswordField("Password", validators=[InputRequired("A valid password is required")])   
+
 class EditProfileForm(SignupForm):
     """Edit profile form."""
 
