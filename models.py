@@ -48,6 +48,7 @@ class User(db.Model):
         if user:
             auth_check=bcrypt.check_password_hash(user.password, password)
             if auth_check:
+                print(f"this user is authorized")
                 return user
             return False
 

@@ -1,0 +1,17 @@
+{% extends 'base.html' %} {% block title %}Welcome Back{% endblock %} {%block
+content%}
+<div class="text-center">
+  <div class="h1 mt-2">Welcome back {{g.username}}</div>
+  <ul>
+    {% for plant in plants %}
+    <li>
+      {{plant.common_name}}
+      <img
+        src="{{plant.default_image.thumbnail}}"
+        alt="picture of {{plant.common_name}}"
+      />
+    </li>
+    {% endfor %}
+  </ul>
+</div>
+{% endblock %}

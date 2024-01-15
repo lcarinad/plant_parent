@@ -1,43 +1,48 @@
-from flask import Flask, request, render_template, flash, redirect, g, session, url_for
+from flask import Flask, render_template, flash, redirect, g, session, url_for
+from helpers import fetch_plant_data
 from sqlalchemy.exc import IntegrityError
 from models import db, connect_db, User
 from forms import SignupForm, LoginForm
 
-curr_user_sess_key = "curr_user"
+CURR_USER_KEY = "curr_user"
 
 app= Flask(__name__)
-app.app_context().push()
 
 app.config['SECRET_KEY']='oh-so-secret'
 app.config['SQLALCHEMY_DATABASE_URI']='postgresql:///plant_db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['SQLALCHEMY_ECHO'] = True
+app.config['SQLALCHEMY_ECHO'] = False
 
 connect_db(app)
+app.app_context().push()
 ################################################################
 #user signup/login/logout
 @app.before_request
 def add_user_to_global():
     """If user logged in, add curr user to Flask global."""
-    if curr_user_sess_key in session:
-        g.user = User.query.get(session[curr_user_sess_key])
+    if CURR_USER_KEY in session:
+        g.user = User.query.get(session[CURR_USER_KEY])
 
     else:
         g.user = None
 
 def add_user_to_sess(user):
     """Add login user to session"""
-    session['curr_user_sess_key']=user.id
+    session[CURR_USER_KEY]=user.id
 
 def logout_user(user):
     """Logout user."""
-    if curr_user_sess_key in session:
-        del session[curr_user_sess_key]
+    if CURR_USER_KEY in session:
+        del session[CURR_USER_KEY]
 
 @app.route("/")
 def show_homepage():
     """Show landing page"""
-    return render_template("home.html")
+    if g.user:
+        plants=fetch_plant_data()
+        return render_template('homeUser.html', plants=plants)
+    else:
+        return render_template("homeanon.html")
 
 @app.route("/signup",methods=['POST', 'GET'])
 def signup():
@@ -77,10 +82,13 @@ def user_login():
             user = User.authenticate(form.username.data, form.password.data)
 
             if user:
+                print(f"*****g:{g.user}******session:{session}")
                 add_user_to_sess(user)
                 flash(f"Welcome Back {user.username}!", 'success')
                 return redirect('/')
 
+            
             flash("Password or username incorrect.", 'danger')
 
     return render_template('login.html', form = form)
+
