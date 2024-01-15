@@ -1,5 +1,5 @@
 from flask import Flask, render_template, flash, redirect, g, session, url_for
-from helpers import fetch_plant_data
+from helpers import fetch_random_plant_data
 from sqlalchemy.exc import IntegrityError
 from models import db, connect_db, User
 from forms import SignupForm, LoginForm
@@ -39,7 +39,7 @@ def logout_user(user):
 def show_homepage():
     """Show landing page"""
     if g.user:
-        plants=fetch_plant_data()
+        plants=fetch_random_plant_data()
         return render_template('homeUser.html', plants=plants)
     else:
         return render_template("homeanon.html")
