@@ -59,6 +59,7 @@ def signup():
             flash ("Registration successful", 'success')
 
             add_user_to_sess(user)
+            add_user_to_global()
             return redirect(url_for("show_homepage"))
         
         except IntegrityError as e:

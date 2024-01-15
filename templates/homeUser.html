@@ -1,17 +1,30 @@
 {% extends 'base.html' %} {% block title %}Welcome Back{% endblock %} {%block
 content%}
-<div class="text-center">
-  <div class="h1 mt-2">Welcome back {{g.username}}</div>
-  <ul>
+
+<div class="h1 mt-2 text-center">Welcome back {{g.username}}</div>
+<div class="container px-4 text-center">
+  <div class="row row-cols-1 row-cols-md-4 gx-4">
     {% for plant in plants %}
-    <li>
-      {{plant.common_name}}
-      <img
-        src="{{plant.default_image.thumbnail}}"
-        alt="picture of {{plant.common_name}}"
-      />
-    </li>
+    <div class="col m-3">
+      <div class="card" style="width: 18rem">
+        {% if plant.default_image.thumbnail %}
+        <img
+          src="{{plant.default_image.thumbnail}}"
+          class="card-img-top"
+          alt="picture of {{plant.common_name}}"
+        />
+        {% else %}
+        <img
+          src="https://upload.wikimedia.org/wikipedia/commons/d/d1/Image_not_available.png?20210219185637"
+          alt="no image available logo"
+        />
+        {% endif %}
+        <div class="card-body">
+          <h5 class="card-title">{{plant.common_name}}</h5>
+        </div>
+      </div>
+    </div>
     {% endfor %}
-  </ul>
+  </div>
 </div>
 {% endblock %}
