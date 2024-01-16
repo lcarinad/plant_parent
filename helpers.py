@@ -2,6 +2,7 @@ import requests
 from random import sample, randint
 from confid import key
 
+
 def fetch_random_plant_data():
     """Make get request to perenual api"""
     random_page=get_random_page()
@@ -23,3 +24,10 @@ def get_random_page():
     """generate random page number"""
     random_page=randint(1, 30)
     return random_page
+
+def fetch_search_terms(term):
+    """Make get request to return search terms"""
+    payload={'key':key,'q':term }
+    response = requests.get(f"https://perenual.com/api/species-list", params=payload)
+    results=response.json().get('data',[])
+    return results

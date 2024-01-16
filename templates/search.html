@@ -1,0 +1,31 @@
+{% extends 'base.html' %} {% block title %}Welcome Back{% endblock %} {%block
+content%}
+
+<!-- ******************results*********** -->
+<h4 class="text-start">results for {{search_term}}:</h4>
+<div class="container text-center">
+  <div class="row g-3">
+    {% for result in results %}
+    <div class="col-md-3 col-xs-1 mb-3">
+      <div class="card p-3" style="width: 18rem">
+        {% if result.default_image.thumbnail %}
+        <img
+          src="{{result.default_image.thumbnail}}"
+          class="card-img-top"
+          alt="picture of {{result.common_name}}"
+        />
+        {% else %}
+        <img
+          src="https://upload.wikimedia.org/wikipedia/commons/d/d1/Image_not_available.png?20210219185637"
+          alt="no image available logo"
+        />
+        {% endif %}
+        <div class="card-body">
+          <h5 class="card-title">{{result.common_name.title()}}</h5>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

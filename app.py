@@ -1,5 +1,5 @@
-from flask import Flask, render_template, flash, redirect, g, session, url_for
-from helpers import fetch_random_plant_data
+from flask import Flask, render_template, flash, redirect, g, session, url_for, request
+from helpers import fetch_random_plant_data, fetch_search_terms
 from sqlalchemy.exc import IntegrityError
 from models import db, connect_db, User
 from forms import SignupForm, LoginForm
@@ -34,15 +34,6 @@ def logout_user(user):
     """Logout user."""
     if CURR_USER_KEY in session:
         del session[CURR_USER_KEY]
-
-@app.route("/")
-def show_homepage():
-    """Show landing page"""
-    if g.user:
-        plants=fetch_random_plant_data()
-        return render_template('homeUser.html', plants=plants)
-    else:
-        return render_template("homeanon.html")
 
 @app.route("/signup",methods=['POST', 'GET'])
 def signup():
@@ -83,7 +74,6 @@ def user_login():
             user = User.authenticate(form.username.data, form.password.data)
 
             if user:
-                print(f"*****g:{g.user}******session:{session}")
                 add_user_to_sess(user)
                 flash(f"Welcome Back {user.username}!", 'success')
                 return redirect('/')
@@ -92,4 +82,23 @@ def user_login():
             flash("Password or username incorrect.", 'danger')
 
     return render_template('login.html', form = form)
-
+####################################
+@app.route("/")
+def show_homepage():
+    """Show landing page"""
+    if g.user:
+        plants=fetch_random_plant_data()
+        return render_template('homeUser.html', plants=plants)
+    else:
+        return render_template("homeanon.html")
+    
+@app.route("/search")
+def search():
+    """Handle search query"""
+    term=request.args.get("q")
+    results=fetch_search_terms(term)
+  
+    if(len(results)==0):
+        flash("No results found for that term. Try another term", 'warning')
+        return redirect(url_for('show_homepage'))
+    return render_template('search.html', results=results, search_term=term)
