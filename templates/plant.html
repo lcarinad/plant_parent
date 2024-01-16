@@ -1,34 +1,64 @@
 {% extends 'base.html' %} {% block title %}{{plant.common_name.title()}}
 Details{% endblock %} {%block content%}
-<h1>Details and Care</h1>
-<div class="card mb-3" style="max-width: 540px">
-  {% if plant.default_image.thumbnail %}
-  <img
-    src="{{plant.default_image.thumbnail}}"
-    class="card-img-top"
-    alt="picture of {{plant.common_name}}"
-  />
-  {% else %}
-  <img
-    src="https://upload.wikimedia.org/wikipedia/commons/d/d1/Image_not_available.png?20210219185637"
-    alt="no image available logo"
-  />
-  {% endif %}
-  <div class="card-body">
-    <h5 class="card-title">{{plant.common_name.title()}}</h5>
-    <p class="card-text">{{plant.description}}</p>
-  </div>
-  <ul class="list-group list-group-flush">
-    <li class="list-group-item">Watering Frequency: {{plant.watering}}</li>
-    <li class="list-group-item">Sunlight: {{plant.sunlight | join(', ')}}</li>
-    <li class="list-group-item">
-      Edible Fruit: {% if plant.edible_fruit == 'false'%} No {%else%}True{%
-      endif %}
-    </li>
-  </ul>
-  <div class="card-body">
-    <a href="#" class="card-link">Card link</a>
-    <a href="#" class="card-link">Another link</a>
+<div class="container">
+  <h1 class="text-center h1">Details and Care</h1>
+  <div class="row">
+    <div class="col-xs-12 col-md-6 mx-auto">
+      <div class="card">
+        {% if plant.default_image.medium_url %}
+        <img
+          src="{{plant.default_image.medium_url}}"
+          class="card-img-top"
+          alt="picture of {{plant.common_name}}"
+        />
+        {% else %}
+        <img
+          src="https://upload.wikimedia.org/wikipedia/commons/d/d1/Image_not_available.png?20210219185637"
+          alt="no image available logo"
+        />
+        {% endif %}
+        <div class="card-body">
+          <h5 class="card-title">{{plant.common_name.title()}}</h5>
+          <p class="card-text d-none d-sm-block">{{plant.description}}</p>
+        </div>
+        <ul class="list-group list-group-flush">
+          <li class="list-group-item">
+            <b>Indoor Plant:</b> {% if plant.indoor== false%} No {%elif
+            plant.indoor==true%} Yes {%else%} NA {%endif %}
+          </li>
+          <li class="list-group-item"><b>Type:</b> {{plant.type}}</li>
+          <li class="list-group-item"><b>Cycle:</b> {{plant.cycle}}</li>
+          <li class="list-group-item">
+            <b>Watering Frequency:</b> {{plant.watering}}
+          </li>
+          <li class="list-group-item">
+            <b>Sunlight:</b> {{plant.sunlight | join(', ')}}
+          </li>
+          <li class="list-group-item">
+            <b>Attracts:</b> {{plant.attracts | join(', ')}}
+          </li>
+          <li class="list-group-item">
+            <b> Zones:</b>{{plant.hardiness.min}} to {{plant.hardiness.max}}
+          </li>
+          <li class="list-group-item">
+            <b>Edible Fruit:</b> {% if plant.edible_fruit== false %} No {%elif
+            plant.edible_fruit==true%} Yes {%else%} NA {%endif %}
+          </li>
+          <li class="list-group-item">
+            <b>Edible Leaf:</b> {% if plant.edible_leaf== false%} No {%elif
+            plant.edible_leaf==true%} Yes {%else%} NA {%endif %}
+          </li>
+          <li class="list-group-item">
+            <b>Medicinal:</b> {% if plant.medicinal== false%} No {%elif
+            plant.medicinal==true%} Yes {%else%} NA {%endif %}
+          </li>
+          <li class="list-group-item">
+            <b>Poisonous To Pets:</b> {% if plant.poisonous_to_pets== false%} No
+            {%elif plant.poisonous_to_pets==true%} Yes {%else%} NA {%endif %}
+          </li>
+        </ul>
+      </div>
+    </div>
   </div>
 </div>
 {% endblock %}
