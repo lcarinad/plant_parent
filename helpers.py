@@ -33,7 +33,6 @@ def fetch_search_terms(term):
 
 def fetch_plant_details(plant_id):
     """Make get request to return plant details"""
-    print(f"************************************plant id:{plant_id}")
     payload={'key':key}
     response = requests.get(f"https://perenual.com/api/species/details/{plant_id}", params=payload)
 

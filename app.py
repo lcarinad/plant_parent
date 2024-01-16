@@ -108,5 +108,4 @@ def show_plant(plant_id):
     """Show details for specific plant"""
 
     plant_data = fetch_plant_details(plant_id)
-    print(f"**************results:{plant_data}")
     return render_template('plant.html', plant=plant_data)

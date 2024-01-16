@@ -1,7 +1,7 @@
 {% extends 'base.html' %} {% block title %}{{plant.common_name.title()}}
 Details{% endblock %} {%block content%}
 <h1>Details and Care</h1>
-<div class="card" style="width: 18rem">
+<div class="card mb-3" style="max-width: 540px">
   {% if plant.default_image.thumbnail %}
   <img
     src="{{plant.default_image.thumbnail}}"
