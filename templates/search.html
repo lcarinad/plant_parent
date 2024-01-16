@@ -7,25 +7,27 @@ content%}
   <div class="row g-3">
     {% for result in results %}
     <div class="col-md-3 col-xs-1 mb-3">
-      <div class="card p-3" style="width: 18rem">
+      <div class="card p-3 results" id="{{result.id}}" style="width: 18rem">
         {% if result.default_image.thumbnail %}
         <img
-          src="{{result.default_image.thumbnail}}"
           class="card-img-top"
+          src="{{result.default_image.thumbnail}}"
           alt="picture of {{result.common_name}}"
         />
         {% else %}
         <img
           src="https://upload.wikimedia.org/wikipedia/commons/d/d1/Image_not_available.png?20210219185637"
-          alt="no image available logo"
+          alt="no image available for {{result.common_name}}"
         />
         {% endif %}
         <div class="card-body">
-          <h5 class="card-title">{{result.common_name.title()}}</h5>
+          <a href="{{url_for('show_plant', plant_id=result.id)}}">
+            <h5 class="card-title">{{result.common_name.title()}}</h5></a
+          >
         </div>
       </div>
+      {% endfor %}
     </div>
-    {% endfor %}
   </div>
+  {% endblock %}
 </div>
-{% endblock %}

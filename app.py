@@ -1,5 +1,5 @@
 from flask import Flask, render_template, flash, redirect, g, session, url_for, request
-from helpers import fetch_random_plant_data, fetch_search_terms
+from helpers import fetch_random_plant_data, fetch_search_terms, fetch_plant_details
 from sqlalchemy.exc import IntegrityError
 from models import db, connect_db, User
 from forms import SignupForm, LoginForm
@@ -102,3 +102,11 @@ def search():
         flash("No results found for that term. Try another term", 'warning')
         return redirect(url_for('show_homepage'))
     return render_template('search.html', results=results, search_term=term)
+
+@app.route("/details/<int:plant_id>")
+def show_plant(plant_id):
+    """Show details for specific plant"""
+
+    plant_data = fetch_plant_details(plant_id)
+    print(f"**************results:{plant_data}")
+    return render_template('plant.html', plant=plant_data)

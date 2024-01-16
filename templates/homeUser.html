@@ -17,15 +17,14 @@ content%}
 <!-- ******************our picks*********** -->
 <h4 class="text-start">our picks:</h4>
 <div class="container text-center">
-  <!-- <div class="row row-cols-1 row-cols-md-4 g-2"> -->
   <div class="row g-3">
     {% for plant in plants %}
     <div class="col-md-3 col-xs-1 mb-3">
-      <div class="card p-3" style="width: 18rem">
+      <div class="card p-3 results" id="{{plant.id}}" style="width: 18rem">
         {% if plant.default_image.thumbnail %}
         <img
-          src="{{plant.default_image.thumbnail}}"
           class="card-img-top"
+          src="{{plant.default_image.thumbnail}}"
           alt="picture of {{plant.common_name}}"
         />
         {% else %}
@@ -35,7 +34,9 @@ content%}
         />
         {% endif %}
         <div class="card-body">
-          <h5 class="card-title">{{plant.common_name.title()}}</h5>
+          <a href="{{url_for('show_plant', plant_id=plant.id)}}">
+            <h5 class="card-title">{{plant.common_name.title()}}</h5></a
+          >
         </div>
       </div>
     </div>

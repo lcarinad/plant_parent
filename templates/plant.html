@@ -1,0 +1,34 @@
+{% extends 'base.html' %} {% block title %}{{plant.common_name.title()}}
+Details{% endblock %} {%block content%}
+<h1>Details and Care</h1>
+<div class="card" style="width: 18rem">
+  {% if plant.default_image.thumbnail %}
+  <img
+    src="{{plant.default_image.thumbnail}}"
+    class="card-img-top"
+    alt="picture of {{plant.common_name}}"
+  />
+  {% else %}
+  <img
+    src="https://upload.wikimedia.org/wikipedia/commons/d/d1/Image_not_available.png?20210219185637"
+    alt="no image available logo"
+  />
+  {% endif %}
+  <div class="card-body">
+    <h5 class="card-title">{{plant.common_name.title()}}</h5>
+    <p class="card-text">{{plant.description}}</p>
+  </div>
+  <ul class="list-group list-group-flush">
+    <li class="list-group-item">Watering Frequency: {{plant.watering}}</li>
+    <li class="list-group-item">Sunlight: {{plant.sunlight | join(', ')}}</li>
+    <li class="list-group-item">
+      Edible Fruit: {% if plant.edible_fruit == 'false'%} No {%else%}True{%
+      endif %}
+    </li>
+  </ul>
+  <div class="card-body">
+    <a href="#" class="card-link">Card link</a>
+    <a href="#" class="card-link">Another link</a>
+  </div>
+</div>
+{% endblock %}
