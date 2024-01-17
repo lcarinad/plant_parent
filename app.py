@@ -116,3 +116,12 @@ def show_plant(plant_id):
         flash("Details on that plant are not available at the moment.", 'warning')
         return redirect(url_for('search'))
     return render_template('plant.html', plant=plant_data)
+
+@app.route("/plantlist")
+def show_all_plants():
+    """Show a list of all plants"""
+    order='asc'
+    page=1
+    plant_data=fetch_search_terms(order=order, page=page)
+
+    return render_template('list.html', plants=plant_data)

@@ -1,0 +1,14 @@
+{% extends 'base.html' %} {% block title %}All Plants{% endblock %} {%block
+content%}
+
+<div class="h1 mt-2 text-center">Browse All Plants</div>
+<ul>
+  {% for plant in plants %}
+  <li>
+    <a href="{{url_for('show_plant', plant_id=plant.id)}}">
+      {{plant.common_name.title()}}</a
+    >
+  </li>
+</ul>
+
+{% endfor %} {% endblock %}
