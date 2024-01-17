@@ -96,7 +96,11 @@ def show_homepage():
 def search():
     """Handle search query"""
     term=request.args.get("q")
-    results=fetch_search_terms(term)
+    indoor_pref=request.args.get("indoor")
+    edible_pref=request.args.get("edible")
+    watering_pref=request.args.get("watering")
+    sun_pref=request.args.get("sunlight")
+    results=fetch_search_terms(term, indoor_pref, edible_pref, watering_pref,sun_pref)
   
     if(len(results)==0):
         flash("No results found for that term. Try another term", 'warning')
@@ -108,4 +112,7 @@ def show_plant(plant_id):
     """Show details for specific plant"""
 
     plant_data = fetch_plant_details(plant_id)
+    if(plant_data) == None:
+        flash("Details on that plant are not available at the moment.", 'warning')
+        return redirect(url_for('search'))
     return render_template('plant.html', plant=plant_data)
