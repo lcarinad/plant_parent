@@ -20,8 +20,8 @@ def get_random_plants(all_plants):
     return random_plants
 
 def get_random_page():
-    """generate random page number"""
-    random_page=randint(1, 30)
+    """generate random page number. Free api allows query to id 3000, 30 plants/page"""
+    random_page=randint(1, 100)
     return random_page
 
 def fetch_search_terms(term):
