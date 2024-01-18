@@ -1,5 +1,5 @@
 from flask import Flask, render_template, flash, redirect, g, session, url_for, request
-from helpers import fetch_random_plant_data, fetch_search_terms, fetch_plant_details
+from helpers import fetch_random_plant_data, fetch_search_terms, fetch_plant_details, get_logout_msg
 from sqlalchemy.exc import IntegrityError
 from models import db, connect_db, User
 from forms import SignupForm, LoginForm
@@ -30,7 +30,7 @@ def add_user_to_sess(user):
     """Add login user to session"""
     session[CURR_USER_KEY]=user.id
 
-def logout_user(user):
+def logout_user():
     """Logout user."""
     if CURR_USER_KEY in session:
         del session[CURR_USER_KEY]
@@ -79,6 +79,13 @@ def user_login():
             flash("Password or username incorrect.", 'danger')
 
     return render_template('login.html', form = form)
+
+@app.route('/logout')
+def user_logout():
+    """Handles user logout"""
+    logout_user()
+    flash(get_logout_msg(), "success")
+    return redirect(url_for('show_homepage'))
 ####################################
 @app.route("/")
 def show_homepage():

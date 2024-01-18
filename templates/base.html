@@ -52,6 +52,17 @@
                 >Login</a
               >
             </li>
+            <form class="d-flex" role="search" action="/search">
+              <input
+                class="form-control me-2"
+                type="search"
+                placeholder="Plant Quest 🌱"
+                aria-label="Search"
+              />
+              <button class="btn btn-outline-success" type="submit">
+                Search
+              </button>
+            </form>
             {% endif %}
             <!-- logged in user nav options -->
             {% if g.user %}
@@ -72,7 +83,7 @@
               <ul class="dropdown-menu">
                 <li><a class="dropdown-item" href="#">View Favorites</a></li>
                 <li><a class="dropdown-item" href="#">Edit Profile</a></li>
-                <li><a class="dropdown-item" href="#">Logout</a></li>
+                <li><a class="dropdown-item" href="/logout">Logout</a></li>
               </ul>
             </li>
             {% endif %}
