@@ -75,10 +75,7 @@ def user_login():
 
             if user:
                 add_user_to_sess(user)
-                flash(f"Welcome Back {user.username}!", 'success')
-                return redirect('/')
-
-            
+                return redirect('/')         
             flash("Password or username incorrect.", 'danger')
 
     return render_template('login.html', form = form)
@@ -120,8 +117,6 @@ def show_plant(plant_id):
 @app.route("/plantlist")
 def show_all_plants():
     """Show a list of all plants"""
-    order='asc'
     page=1
-    plant_data=fetch_search_terms(order=order, page=page)
-
-    return render_template('list.html', plants=plant_data)
+    plant_data=fetch_search_terms(order='asc', page=page)
+    return render_template('list.html', plants=plant_data, page=page)
