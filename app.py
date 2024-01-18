@@ -127,3 +127,9 @@ def show_all_plants():
     page=1
     plant_data=fetch_search_terms(order='asc', page=page)
     return render_template('list.html', plants=plant_data, page=page)
+
+@app.route("/add-favorite/<int:plant_id>")
+def add_to_favorite():
+    """User add a plant to favorite"""
+
+    return redirect(url_for(show_homepage))

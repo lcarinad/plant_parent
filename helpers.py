@@ -2,7 +2,6 @@ import requests, json
 from random import sample, randint
 from confid import key
 
-
 def fetch_random_plant_data():
     """Make get request to perenual api"""
     random_page=get_random_page()
@@ -46,6 +45,6 @@ def fetch_plant_details(plant_id):
     
 def get_logout_msg():
     messages =["Blossom back soon, we'll miss your photosynthesis!🌿👋", "Rooting for your return! See you in the plant-osphere! 🌱🚀", "Take a leaf, but don't stay away too long! 🍃👀","Farewell, green thumb! We'll be here, photosynthesizing without you! 🌞🌿", "Branch out and explore, but don't forget your roots! 🌍🌳", "Time to leaf, but remember, you're always in our plant-astic garden! 🌸👋", "May your journeys be as fruitful as a well-nurtured garden! 🌺🚀","Signing off for now! Your absence will be felt in our plantiverse! 🌿😢"]
-    random_idx=randint(1, len(messages))
+    random_idx=randint(0, len(messages))
 
     return messages[random_idx]

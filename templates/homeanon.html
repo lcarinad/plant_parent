@@ -1,13 +1,46 @@
 {% extends 'base.html' %} {% block title %}Plant Mom🌵{% endblock %} {%block
 content%}
-<div class="text-center">
-  <div class="h1 mt-2">Plant Raising Made Easy</div>
+<div class="container-fluid">
+  <div class="row">
+    <!-- Left side with text -->
+    <div class="col-md-6 my-auto homepage-textbox">
+      <div class="lh-lg font-monospace">
+        <h1 class="h1 homepage">Plant Mom Is...</h1>
+        <h3 class="h3 homepage">Plant Raising Made Easy</h3>
+        <h3 class="h3 homepage">Your Ideal Plant🌿, Your Simple Guide</h3>
+        <div class="row mt-4">
+          <div class="col">
+            <h4>New to Plant Mom?</h4>
+            <a
+              class="btn btn-primary homepage-btn border-0"
+              href="/signup"
+              role="button"
+              >Sign Up Here</a
+            >
+          </div>
+          <div class="col">
+            <h4>Returning Members</h4>
+            <a
+              class="btn btn-primary homepage-btn border-0"
+              href="/login"
+              role="button"
+              >Log In Here</a
+            >
+          </div>
+        </div>
+      </div>
+    </div>
 
-  <div class="h2">Your Ideal Plant🌿, Your Simple Guide</div>
-  <div class="h2">Login <a href="/login">Here</a></div>
-  <div class="h3">New to Plant Mom?</div>
-  <div class="h4">Sign up now to begin your journey into Motherhood</div>
-
-  <a class="btn btn-success" href="/signup" role="button">Sign Up</a>
+    <!-- Right side with image -->
+    <div class="col-md-6">
+      <div class="homepage img-responsive">
+        <img
+          src="/static/media/Screenshot 2024-01-18 at 1.03.03 PM.png"
+          class="img-fluid rounded pe-0 py-0"
+          alt="woman holding plant"
+        />
+      </div>
+    </div>
+  </div>
 </div>
 {% endblock %}

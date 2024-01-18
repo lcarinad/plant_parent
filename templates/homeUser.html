@@ -1,7 +1,9 @@
 {% extends 'base.html' %} {% block title %}Welcome Back{% endblock %} {%block
 content%}
 
-<div class="h1 mt-2 text-center">Welcome back {{g.user.username}}</div>
+<div class="h1 mt-2 text-center font-monospace" style="color: #567174">
+  Welcome back {{g.user.username}}
+</div>
 <!-- ********search form**************** -->
 <div class="container mb-3" id="search-form">
   <form action="/search">
@@ -10,14 +12,14 @@ content%}
         <input
           role="search"
           type="search"
-          class="form-control form-control-sm"
+          class="form-control form-control-lg"
           placeholder="Search for your next plant baby🌿"
           name="q"
           aria-label="Search"
         />
       </div>
       <div class="col-md-3">
-        <button type="submit" class="btn btn-outline-success btn-sm">
+        <button type="submit" class="btn btn-outline-success btn-lg">
           Search
         </button>
       </div>
@@ -152,36 +154,51 @@ content%}
   </form>
 </div>
 <!-- ******************our picks*********** -->
-<h4 class="text-start">our picks:</h4>
-<div class="container text-center">
-  <div class="row g-3">
-    {% for plant in plants %}
-    <div class="col">
-      <div
-        class="card p-3 results"
-        id="{{plant.id}}"
-        style="width: 18rem; height: 21rem"
-      >
-        {% if plant.default_image.thumbnail %}
-        <img
-          class="card-img-top"
-          src="{{plant.default_image.thumbnail}}"
-          alt="picture of {{plant.common_name}}"
-        />
-        {% else %}
-        <img
-          src="https://upload.wikimedia.org/wikipedia/commons/d/d1/Image_not_available.png?20210219185637"
-          alt="no image available logo"
-        />
-        {% endif %}
-        <div class="card-body">
-          <a href="{{url_for('show_plant', plant_id=plant.id)}}">
-            <h5 class="card-title">{{plant.common_name.title()}}</h5></a
-          >
+<div class="font-monospace">
+  <h4 class="text-start">our picks:</h4>
+  <div class="container text-center">
+    <div class="row g-3">
+      {% for plant in plants %}
+      <div class="col">
+        <div
+          class="card p-3 results"
+          id="{{plant.id}}"
+          style="width: 18rem; height: 21rem"
+        >
+          {% if plant.default_image.thumbnail %}
+          <img
+            class="card-img-top pb-0"
+            src="{{plant.default_image.thumbnail}}"
+            alt="picture of {{plant.common_name}}"
+          />
+          {% else %}
+          <img
+            src="https://upload.wikimedia.org/wikipedia/commons/d/d1/Image_not_available.png?20210219185637"
+            alt="no image available logo"
+          />
+          {% endif %}
+
+          <div class="card-body">
+            <div class="row">
+              <div class="col-10">
+                <a href="{{url_for('show_plant', plant_id=plant.id)}}">
+                  <h5 class="card-title">{{plant.common_name.title()}}</h5></a
+                >
+              </div>
+
+              <div class="col-2">
+                <form action=/add_favorite/{{plant.id}} method="post" id="add-like">
+                  <button class="btn btn-lg" role="submit">
+                    <i class="fa-regular fa-heart"></i>
+                  </button>
+                </form>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
+      {% endfor %}
     </div>
-    {% endfor %}
   </div>
 </div>
 {% endblock %}

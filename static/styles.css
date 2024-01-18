@@ -1,0 +1,17 @@
+.homepage-textbox {
+  color: #567174;
+}
+
+.homepage-btn {
+  background-color: #567174;
+  border-radius: 50px;
+  padding: 20px 40px;
+  font-size: 16px;
+  margin-bottom: 5px;
+}
+
+.homepage-btn:hover {
+  background-color: whitesmoke;
+  color: #567174;
+  animation: bubble 0.4s ease-out;
+}
