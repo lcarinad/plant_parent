@@ -1,6 +1,7 @@
 from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
 
+
 db = SQLAlchemy()
 
 bcrypt=Bcrypt()
@@ -59,13 +60,21 @@ class Plant(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     api_id = db.Column(db.Integer, nullable=False, unique=True)   
     name=db.Column(db.String, nullable=False)
-    image_url=db.Column(db.String)
+    image_url=db.Column(db.String, default="https://upload.wikimedia.org/wikipedia/commons/d/d1/Image_not_available.png?20210219185637")
 
     def __repr__(self):
         """Show info about a plant"""
         p=self
         return f"<Plant_id:{p.id} Plant_api_id:{p.api_id} Name:{p.name}>"
     
+    @classmethod
+    def add_plant(cls, api_id, name, image_url):
+        """Add plant to db"""
+        plant = Plant(api_id=api_id, name=name, image_url=image_url)
+        db.session.add(plant)
+        return plant
+
+
 class Favorite(db.Model):
     """User favorite plants table"""
 

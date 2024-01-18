@@ -21,10 +21,22 @@ content%}
         />
         {% endif %}
         <div class="card-body">
-          <a href="{{url_for('show_plant', plant_id=result.id)}}">
-            <h5 class="card-title">{{result.common_name.title()}}</h5></a
-          >
-        </div>
+            <div class="row">
+              <div class="col-10">
+                <a href="{{url_for('show_plant', plant_id=result.id)}}">
+                  <h5 class="card-title">{{result.common_name.title()}}</h5></a
+                >
+              </div>
+
+              <div class="col-2">
+                <form action=/add_favorite/{{result.id}} method="post" id="add-like">
+                  <button class="btn btn-lg" role="submit">
+                    <i class="fa-regular fa-heart"></i>
+                  </button>
+                </form>
+              </div>
+            </div>
+          </div>
       </div>
       {% endfor %}
     </div>
