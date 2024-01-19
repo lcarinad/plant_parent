@@ -1,6 +1,8 @@
 import requests, json
 from random import sample, randint
 from confid import key
+from models import Plant
+
 
 def fetch_random_plant_data():
     """Make get request to perenual api"""
@@ -48,3 +50,20 @@ def get_logout_msg():
     random_idx=randint(1, len(messages))
 
     return messages[random_idx]
+
+def add_plant(plant_data):
+    """Add plant to db"""
+    
+    api_id=plant_data.get('id')
+    name=plant_data.get('common_name')
+    image_na_url="https://upload.wikimedia.org/wikipedia/commons/d/d1/Image_not_available.png?20210219185637"
+
+    default_image=plant_data.get('default_image')
+    image_url = image_na_url
+
+    if default_image and 'thumbnail' in default_image:
+        image_url = default_image['thumbnail']
+
+    plant=Plant.add_plant(api_id=api_id, name=name, image_url=image_url)
+    return plant
+

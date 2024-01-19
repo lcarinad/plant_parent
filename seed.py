@@ -1,6 +1,6 @@
 """ Seed file to make sample data for plant care app."""
 
-from models import User, Plant, Favorite, db
+from models import User, Plant, db
 from app import app
 
 # Create all tables
@@ -9,7 +9,7 @@ from app import app
 # if tables aren't empty, empty them
 User.query.delete()
 Plant.query.delete()
-Favorite.query.delete()
+# Favorite.query.delete()
 
 # Add user instances
 user1 = User(username='user1', email='user1@example.com', password='password1')
@@ -29,12 +29,12 @@ db.session.add(plant2)
 db.session.commit()
 
 # Add favorite associations
-favorite1 = Favorite(user_id=user1.id, plant_id=plant1.id)
-favorite2 = Favorite(user_id=user2.id, plant_id=plant2.id)
+# favorite1 = Favorite(user_id=user1.id, plant_id=plant1.id)
+# favorite2 = Favorite(user_id=user2.id, plant_id=plant2.id)
 
-# Add new favorite objects to session
-db.session.add(favorite1)
-db.session.add(favorite2)
+# # Add new favorite objects to session
+# db.session.add(favorite1)
+# db.session.add(favorite2)
 
-# Commit the changes to the database
-db.session.commit()
+# # Commit the changes to the database
+# db.session.commit()

@@ -20,11 +20,11 @@ class User(db.Model):
     username = db.Column(db.String, nullable=False, unique=True)
     email=db.Column(db.String,nullable=False, unique=True)
     password=db.Column(db.String, nullable=False)
-    favorites = db.relationship('Plant', secondary='users_favorites', backref='users')
     pref_indoor = db.Column(db.Boolean)
     pref_sunlight= db.Column(db.String)
     pref_watering=db.Column(db.String)
     pref_edible=db.Column(db.Boolean)
+    favorites = db.relationship('Plant', secondary='favorites', backref='users')
 
     def __repr__(self):
         """Show info about user."""
@@ -76,10 +76,8 @@ class Plant(db.Model):
 
 
 class Favorite(db.Model):
-    """User favorite plants table"""
-
-    __tablename__ = "users_favorites"
+    """Mapping a user to their favorited plants"""
+    __tablename__ = "favorites"
     user_id = db.Column(db.Integer, db.ForeignKey('users.id', ondelete='cascade'),primary_key=True)
     plant_id = db.Column(db.Integer, db.ForeignKey('plants.id'),primary_key=True)
 
-    

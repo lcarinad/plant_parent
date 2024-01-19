@@ -1,5 +1,5 @@
 from flask import Flask, render_template, flash, redirect, g, session, url_for, request
-from helpers import fetch_random_plant_data, fetch_search_terms, fetch_plant_details, get_logout_msg
+from helpers import fetch_random_plant_data, fetch_search_terms, fetch_plant_details, get_logout_msg, add_plant
 from sqlalchemy.exc import IntegrityError
 from models import db, connect_db, User, Plant
 from forms import SignupForm, LoginForm
@@ -131,20 +131,25 @@ def show_all_plants():
 @app.route("/add_favorite/<int:plant_id>", methods=["POST", "GET"])
 def add_favorite(plant_id):
     """Check to see if plant is in db.  If not add plant to db.  Add plant to favorite"""
+
     if g.user:
+
+        user_id=g.user.id
+        user = User.query.get(user_id)
         plant= Plant.query.filter_by(api_id=plant_id).first()
+
         if plant:
-            print("*************plant is here")
+            user.favorites.append(plant)
+            
         else:
-
             plant_data=fetch_plant_details(plant_id)
-
-            name=plant_data.get('common_name')
-            image_url = plant_data.get('default_image').get('thumbnail', "https://upload.wikimedia.org/wikipedia/commons/d/d1/Image_not_available.png?20210219185637")
-
-            Plant.add_plant(api_id=plant_id, name=name, image_url=image_url)
+            print(f"************plant_data:{plant_data}")
+            plant=add_plant(plant_data)           
             db.session.commit()
-            return redirect(url_for("show_homepage"))
+            user.favorites.append(plant)
+
+        db.session.commit()
+        return redirect(url_for("show_homepage"))
     else:
         flash("You must login to favorite a plant.", "danger")
         return redirect(url_for('show_homepage'))
