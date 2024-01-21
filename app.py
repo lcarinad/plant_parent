@@ -5,6 +5,7 @@ from models import db, connect_db, User, Plant, Favorite
 from forms import SignupForm, LoginForm
 
 CURR_USER_KEY = "curr_user"
+FAVES="curr_user_faves"
 
 app= Flask(__name__)
 
@@ -29,6 +30,20 @@ def add_user_to_global():
 def add_user_to_sess(user):
     """Add login user to session"""
     session[CURR_USER_KEY]=user.id
+
+    if user.favorites:
+        session[FAVES] = [plant.id for plant in user.favorites]
+        print(f"**************************{session[FAVES]}")
+
+    # curr_user_faves=user.favorites
+    # session["CURR_USER_FAVES"]=[]
+    # CURR_USER_FAVES=session["CURR_USER_FAVES"]
+    # if curr_user_faves:
+    #     for plant in curr_user_faves:
+    #         plant = jsonify(plant.id)
+    #         CURR_USER_FAVES.append(plant)
+    #         session["CURR_USER_FAVES"]=CURR_USER_FAVES
+    #     print(f"******************{session["CURR_USER_FAVES"]}")
 
 def logout_user():
     """Logout user."""
@@ -91,7 +106,7 @@ def user_logout():
 def show_homepage():
     """Show landing page"""
     if g.user:
-        print(f"*********{g.user.favorites}")
+        
         plants=fetch_random_plant_data()
         return render_template('homeUser.html', plants=plants)
     else:
@@ -139,8 +154,8 @@ def add_favorite(plant_id):
         plant= Plant.query.filter_by(api_id=plant_id).first()
 
         if plant:
-            user.favorites.append(plant)
-            
+            user.favorites.append(plant) 
+      
         else:
             plant_data=fetch_plant_details(plant_id)
             plant=add_plant(plant_data)           
@@ -148,6 +163,8 @@ def add_favorite(plant_id):
             user.favorites.append(plant)
 
         db.session.commit()
+        
+        # add_fave_to_session(plant)
         return jsonify({"msg":"Success"}), 201
     else:
         flash("You must login to favorite a plant.", "danger")
@@ -159,8 +176,22 @@ def delete_favorite(plant_id):
     if g.user:
         curr_user_id=g.user.id
         plant=Plant.query.filter_by(api_id=plant_id).one()
-        p_db_id=plant.id
-        faved_plant=Favorite.query.filter(Favorite.user_id==curr_user_id, Favorite.plant_id==p_db_id).one()
+        faved_plant=Favorite.query.filter(Favorite.user_id==curr_user_id, Favorite.plant_id==plant.id).one()
         db.session.delete(faved_plant)
         db.session.commit()
+        # remove_fave_from_session(plant)
+
         return jsonify({"msg":"Success, object deleted"}, 200)
+    
+
+def add_fave_to_session(plant):
+    """Add a favorited plan to the users favorites in the session"""
+    if FAVES not in session:
+        session[FAVES]=[]
+    
+    session[FAVES].append(plant.id)
+
+def remove_fave_from_session(plant):
+    """Remove and unfavorited plant from the user's favorites in the session"""
+ 
+    session[FAVES].remove(plant)
