@@ -187,9 +187,13 @@ content%}
               </div>
 
               <div class="col-2">
-                <form action=/add_favorite/{{plant.id}} method="post" id="add-like">
-                  <button class="btn btn-lg" role="submit">
-                    <i class="fa-regular fa-heart"></i>
+                <form class="like" action="">
+                  <button
+                    class="btn btn-lg fave-btn unfaved"
+                    id="{{plant.id}}"
+                    role="submit"
+                  >
+                    <i class="fa-solid fa-heart"></i>
                   </button>
                 </form>
               </div>
@@ -197,8 +201,9 @@ content%}
           </div>
         </div>
       </div>
-      {% endfor %}
     </div>
+    {% endfor %}
   </div>
 </div>
+
 {% endblock %}

@@ -1,7 +1,7 @@
-from flask import Flask, render_template, flash, redirect, g, session, url_for, request
+from flask import Flask, render_template, flash, redirect, g, session, url_for, request, jsonify
 from helpers import fetch_random_plant_data, fetch_search_terms, fetch_plant_details, get_logout_msg, add_plant
 from sqlalchemy.exc import IntegrityError
-from models import db, connect_db, User, Plant
+from models import db, connect_db, User, Plant, Favorite
 from forms import SignupForm, LoginForm
 
 CURR_USER_KEY = "curr_user"
@@ -91,6 +91,7 @@ def user_logout():
 def show_homepage():
     """Show landing page"""
     if g.user:
+        print(f"*********{g.user.favorites}")
         plants=fetch_random_plant_data()
         return render_template('homeUser.html', plants=plants)
     else:
@@ -128,12 +129,11 @@ def show_all_plants():
     plant_data=fetch_search_terms(order='asc', page=page)
     return render_template('list.html', plants=plant_data, page=page)
 
-@app.route("/add_favorite/<int:plant_id>", methods=["POST", "GET"])
+@app.route("/add_favorite/<int:plant_id>", methods=["POST"])
 def add_favorite(plant_id):
     """Check to see if plant is in db.  If not add plant to db.  Add plant to favorite"""
 
     if g.user:
-
         user_id=g.user.id
         user = User.query.get(user_id)
         plant= Plant.query.filter_by(api_id=plant_id).first()
@@ -143,13 +143,24 @@ def add_favorite(plant_id):
             
         else:
             plant_data=fetch_plant_details(plant_id)
-            print(f"************plant_data:{plant_data}")
             plant=add_plant(plant_data)           
             db.session.commit()
             user.favorites.append(plant)
 
         db.session.commit()
-        return redirect(url_for("show_homepage"))
+        return jsonify({"msg":"Success"}), 201
     else:
         flash("You must login to favorite a plant.", "danger")
-        return redirect(url_for('show_homepage'))
+        return jsonify({"error":"User is not logged in"}), 401
+
+@app.route("/delete_favorite/<int:plant_id>", methods=["POST"])
+def delete_favorite(plant_id):
+    """Delete previously faved plant from db"""
+    if g.user:
+        curr_user_id=g.user.id
+        plant=Plant.query.filter_by(api_id=plant_id).one()
+        p_db_id=plant.id
+        faved_plant=Favorite.query.filter(Favorite.user_id==curr_user_id, Favorite.plant_id==p_db_id).one()
+        db.session.delete(faved_plant)
+        db.session.commit()
+        return jsonify({"msg":"Success, object deleted"}, 200)

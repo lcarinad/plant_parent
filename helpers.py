@@ -9,7 +9,9 @@ def fetch_random_plant_data():
     random_page=get_random_page()
     payload={'key':key, 'page':random_page}
     response = requests.get(f"https://perenual.com/api/species-list", params=payload)
+    print(f"****************res:{response}")
     all_plants=response.json().get('data',[])
+
     random_plants=get_random_plants(all_plants)
     return random_plants
 

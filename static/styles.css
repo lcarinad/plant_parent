@@ -15,3 +15,11 @@
   color: #567174;
   animation: bubble 0.4s ease-out;
 }
+
+.unfaved {
+  color: #d1d1d1;
+}
+
+.faved {
+  color: tomato;
+}
