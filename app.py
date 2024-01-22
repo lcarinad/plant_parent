@@ -174,6 +174,25 @@ def delete_favorite(plant_id):
 
         return jsonify({"msg":"Success, object deleted"}, 200)
     
+@app.route("/users/<int:user_id>/favorites")    
+def view_favorites(user_id):
+    """Show list of user's favorited plants"""
+    if not g.user:
+        flash("You must login to view your favorite plant babies.", "danger")
+        return redirect(url_for(user_login))
+    user=User.query.get_or_404(user_id)
+    favorites=user.favorites
+    fave_info_list=[]
+    for fave in favorites:
+        fave_info={
+             'id':fave.api_id,
+              'name':fave.name,
+              'image':fave.image_url
+         }
+        fave_info_list.append(fave_info)
+
+    return render_template('/favorites.html', favorites=fave_info_list)
+     
 
 def add_fave_to_session(plant):
     """Add a favorited plan to the users favorites in the session"""

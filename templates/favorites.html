@@ -1,0 +1,57 @@
+{% extends 'base.html' %} {% block title %}Favorites{% endblock %} {%block
+content%}
+<div class="h1 mt-2 text-start">Favorites</div>
+<div class="lead text-start" style="color: #868484">
+  Parents claim no favorites, but with plants, we break the rules
+</div>
+
+<table class="table">
+  <thead>
+    <tr>
+      <th scope="col">Image</th>
+      <th scope="col">Name</th>
+      <th scope="col">Sunlight</th>
+      <th scope="col">Watering</th>
+    </tr>
+  </thead>
+
+  <tbody>
+    {%for fave in favorites %}
+    <tr>
+      <td>
+        <img
+          src="{{fave.image}}"
+          class="img-thumbnail"
+          style="width: 200px; height: 200px"
+          alt="image for {{fave.name}}"
+        />
+      </td>
+      <td>
+        <div class="row">
+          <div class="col-10">
+            <a href="{{url_for('show_plant', plant_id=fave.id)}}"
+              >{{fave.name}}</a
+            >
+          </div>
+          <div class="col-2">
+            <form class="like" action="">
+              <button
+                class="btn btn-lg fave-btn faved"
+                id="{{fave.id}}"
+                role="submit"
+              >
+                <i class="fa-solid fa-heart"></i>
+              </button>
+            </form>
+          </div>
+        </div>
+      </td>
+      <td>NA</td>
+      <td>NA</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+{% for plant in favorites %} {% include 'plant_card.html' %} {% endfor %} {%
+endblock %}
