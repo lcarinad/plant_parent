@@ -35,16 +35,6 @@ def add_user_to_sess(user):
         session[FAVES] = [plant.id for plant in user.favorites]
         print(f"**************************{session[FAVES]}")
 
-    # curr_user_faves=user.favorites
-    # session["CURR_USER_FAVES"]=[]
-    # CURR_USER_FAVES=session["CURR_USER_FAVES"]
-    # if curr_user_faves:
-    #     for plant in curr_user_faves:
-    #         plant = jsonify(plant.id)
-    #         CURR_USER_FAVES.append(plant)
-    #         session["CURR_USER_FAVES"]=CURR_USER_FAVES
-    #     print(f"******************{session["CURR_USER_FAVES"]}")
-
 def logout_user():
     """Logout user."""
     if CURR_USER_KEY in session:
@@ -149,13 +139,14 @@ def add_favorite(plant_id):
     """Check to see if plant is in db.  If not add plant to db.  Add plant to favorite"""
 
     if g.user:
+        print(f"=) =) =)inside add fave func")
         user_id=g.user.id
         user = User.query.get(user_id)
         plant= Plant.query.filter_by(api_id=plant_id).first()
 
         if plant:
             user.favorites.append(plant) 
-      
+            
         else:
             plant_data=fetch_plant_details(plant_id)
             plant=add_plant(plant_data)           
@@ -164,7 +155,7 @@ def add_favorite(plant_id):
 
         db.session.commit()
         
-        # add_fave_to_session(plant)
+        add_fave_to_session(plant)
         return jsonify({"msg":"Success"}), 201
     else:
         flash("You must login to favorite a plant.", "danger")
@@ -179,7 +170,7 @@ def delete_favorite(plant_id):
         faved_plant=Favorite.query.filter(Favorite.user_id==curr_user_id, Favorite.plant_id==plant.id).one()
         db.session.delete(faved_plant)
         db.session.commit()
-        # remove_fave_from_session(plant)
+        remove_fave_from_session(plant)
 
         return jsonify({"msg":"Success, object deleted"}, 200)
     
@@ -190,8 +181,10 @@ def add_fave_to_session(plant):
         session[FAVES]=[]
     
     session[FAVES].append(plant.id)
+    print(f"YYYYY*************session[faves]:{session[FAVES]}")
 
 def remove_fave_from_session(plant):
     """Remove and unfavorited plant from the user's favorites in the session"""
- 
-    session[FAVES].remove(plant)
+    if FAVES in session:
+        if plant.id in session[FAVES]:
+                               session[FAVES].remove(plant.id)

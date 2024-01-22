@@ -30,6 +30,15 @@ content%}
 
             <div class="col-2">
               <form action="" class="like">
+                {% if session[FAVES] %} {% if result.id in session[FAVES] %}
+                <button
+                  class="btn btn-lg fave-btn faved"
+                  id="{{result.id}}"
+                  role="submit"
+                >
+                  <i class="fa-solid fa-heart"></i>
+                </button>
+                {% endif %} {% else %}
                 <button
                   class="btn btn-lg fave-btn unfaved"
                   id="{{result.id}}"
@@ -37,6 +46,7 @@ content%}
                 >
                   <i class="fa-solid fa-heart"></i>
                 </button>
+                {% endif %}
               </form>
             </div>
           </div>
