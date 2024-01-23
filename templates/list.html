@@ -2,6 +2,7 @@
 content%}
 
 <div class="h1 mt-2 text-center">Browse All Plants</div>
+
 <ul>
   {% for plant in plants %}
   <li>
@@ -9,8 +10,9 @@ content%}
       {{plant.common_name.title()}}</a
     >
   </li>
+
+  {% endfor %}
 </ul>
-{% endfor %}
 <nav aria-label="Page navigation to browse plant list">
   <ul class="pagination">
     <li class="page-item">

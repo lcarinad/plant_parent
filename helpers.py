@@ -31,8 +31,12 @@ def fetch_search_terms(term=None,pref_indoor=None, pref_edible=None, pref_wateri
     payload={'key':key,'q':term,'indoor':pref_indoor,'edible':pref_edible,'watering':pref_watering, 'sunlight':pref_sunlight,'order':order, 'page':page }
 
     response = requests.get(f"https://perenual.com/api/species-list", params=payload)
-    results=response.json().get('data',[])
+    unusable_results=response.json().get('data',[])
+    results=[]
 
+    for result in unusable_results:
+        if 'id' in result and result['id'] <=3000:
+            results.append(result)
     return results
 
 def fetch_plant_details(plant_id):
