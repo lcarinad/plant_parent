@@ -42,3 +42,17 @@ function handleError(error) {
 $(".adv-search-btn").on("click", function (e) {
   $(".adv-search-div").toggleClass("adv-search-form-h adv-search-form-v");
 });
+
+// ****************pagination for list page********************************
+let $p1 = $(".p1");
+let $p2 = $(".p2");
+let $p3 = $(".p3");
+let $prev = $(".prev");
+let $next = $(".next");
+
+$(".page-link").on("click", function (e) {
+  if ($(this).hasClass("p2")) {
+    let p_num = 2;
+    axios.get(`http://127.0.0.1:5000/plant_list/${p_num}`);
+  }
+});

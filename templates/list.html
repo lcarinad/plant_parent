@@ -10,5 +10,50 @@ content%}
     >
   </li>
 </ul>
+{% endfor %}
+<nav aria-label="Page navigation to browse plant list">
+  <ul class="pagination">
+    <li class="page-item">
+      <a
+        id="prev"
+        class="page-link prev"
+        href="{{url_for('show_all_plants', p_num=page-1|default(1))}}"
+        >Previous</a
+      >
+    </li>
 
-{% endfor %} {% endblock %}
+    <li class="page-item">
+      <a
+        id="p1"
+        class="page-link p1"
+        href="{{url_for('show_all_plants', p_num=1)}}"
+        >1</a
+      >
+    </li>
+    <li class="page-item">
+      <a
+        id="p2"
+        class="page-link p2"
+        href="{{url_for('show_all_plants', p_num=2)}}"
+        >2</a
+      >
+    </li>
+    <li class="page-item">
+      <a
+        id="p3"
+        class="page-link p3"
+        href="{{url_for('show_all_plants', p_num=3)}}"
+        >3</a
+      >
+    </li>
+    <li class="page-item">
+      <a
+        id="next"
+        class="page-link next"
+        href="{{url_for('show_all_plants', p_num=page+1)}}"
+        >Next</a
+      >
+    </li>
+  </ul>
+</nav>
+{% endblock %}
