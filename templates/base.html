@@ -93,7 +93,13 @@
                     >View Favorites</a
                   >
                 </li>
-                <li><a class="dropdown-item" href="#">Edit Profile</a></li>
+                <li>
+                  <a
+                    class="dropdown-item"
+                    href="{{url_for('edit_profile', user_id=g.user.id)}}"
+                    >Edit Profile</a
+                  >
+                </li>
                 <li><a class="dropdown-item" href="/logout">Logout</a></li>
               </ul>
             </li>

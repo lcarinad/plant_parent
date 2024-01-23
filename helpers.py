@@ -26,9 +26,9 @@ def get_random_page():
     random_page=randint(1, 100)
     return random_page
 
-def fetch_search_terms(term=None,indoor_pref=None,edible_pref=None,watering_pref=None,sun_pref=None,order=None, page=None):
+def fetch_search_terms(term=None,pref_indoor=None, pref_edible=None, pref_watering=None, pref_sunlight=None,order=None, page=None):
     """Make get request to return search terms"""
-    payload={'key':key,'q':term,'indoor':indoor_pref,'edible':edible_pref,'watering':watering_pref, 'sunlight':sun_pref,'order':order, 'page':page }
+    payload={'key':key,'q':term,'indoor':pref_indoor,'edible':pref_edible,'watering':pref_watering, 'sunlight':pref_sunlight,'order':order, 'page':page }
 
     response = requests.get(f"https://perenual.com/api/species-list", params=payload)
     results=response.json().get('data',[])

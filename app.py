@@ -1,8 +1,8 @@
 from flask import Flask, render_template, flash, redirect, g, session, url_for, request, jsonify
-from helpers import fetch_random_plant_data, fetch_search_terms, fetch_plant_details, get_logout_msg, add_plant
+from helpers import fetch_random_plant_data, fetch_search_terms, fetch_plant_details, get_logout_msg, add_plant, get_random_plants
 from sqlalchemy.exc import IntegrityError
 from models import db, connect_db, User, Plant, Favorite
-from forms import SignupForm, LoginForm
+from forms import SignupForm, LoginForm, EditProfileForm
 
 CURR_USER_KEY = "curr_user"
 FAVES="curr_user_faves"
@@ -93,8 +93,18 @@ def user_logout():
 @app.route("/")
 def show_homepage():
     """Show landing page"""
-    if g.user:
+    if g.user.pref_indoor or g.user.pref_sunlight or g.user.pref_watering or g.user.pref_edible:
+
+        pref_plants=fetch_search_terms(pref_indoor=g.user.pref_indoor, pref_edible=g.user.pref_edible, pref_watering=g.user.pref_watering, pref_sunlight=g.user.pref_sunlight)
+
+        if(len(pref_plants)==0):
+            # find other plants
+            flash("No results found for that term. Try another term", 'warning')
         
+        plants=get_random_plants(pref_plants)
+      
+        return render_template('homeUser.html', plants=plants)
+    elif g.user:
         plants=fetch_random_plant_data()
         return render_template('homeUser.html', plants=plants)
     else:
@@ -104,11 +114,11 @@ def show_homepage():
 def search():
     """Handle search query"""
     term=request.args.get("q")
-    indoor_pref=request.args.get("indoor")
-    edible_pref=request.args.get("edible")
-    watering_pref=request.args.get("watering")
-    sun_pref=request.args.get("sunlight")
-    results=fetch_search_terms(term, indoor_pref, edible_pref, watering_pref,sun_pref)
+    pref_indoor=request.args.get("indoor")
+    pref_edible=request.args.get("edible")
+    pref_watering=request.args.get("watering")
+    pref_sunlight=request.args.get("sunlight")
+    results=fetch_search_terms(term, pref_indoor, pref_edible, pref_watering,pref_sunlight)
   
     if(len(results)==0):
         flash("No results found for that term. Try another term", 'warning')
@@ -191,6 +201,30 @@ def view_favorites(user_id):
 
     return render_template('/favorites.html', favorites=fave_info_list)
      
+@app.route('/users/profile/<int:user_id>/edit', methods=["GET", "POST"])
+def edit_profile(user_id):
+    """Update profile for current user"""
+    if not g.user:
+        flash("You must login to edit your profile", "danger")
+        return redirect(url_for(user_login))
+    
+    form = EditProfileForm(obj=g.user)
+    if form.validate_on_submit():
+        user = User.authenticate(form.username.data, form.password.data)
+        if user:
+                user.username=form.username.data
+                user.email=form.email.data
+                user.pref_indoor=form.pref_indoor.data
+                user.pref_edible=form.pref_edible.data
+                user.pref_sunlight=form.pref_sunlight.data
+                user.pref_watering=form.pref_watering.data
+
+                db.session.commit()
+                flash("You updated your profile!", "success")
+                return redirect(url_for("show_homepage"))
+        else:
+             flash("Invalid Password. Please enter your correct password", "danger")
+    return render_template("edit.html", form=form)
 
 def add_fave_to_session(plant):
     """Add a favorited plan to the users favorites in the session"""
@@ -198,7 +232,6 @@ def add_fave_to_session(plant):
         session[FAVES]=[]
     
     session[FAVES].append(plant.id)
-    print(f"YYYYY*************session[faves]:{session[FAVES]}")
 
 def remove_fave_from_session(plant):
     """Remove and unfavorited plant from the user's favorites in the session"""

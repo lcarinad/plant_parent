@@ -1,0 +1,40 @@
+{% extends 'base.html' %} {% block title %}Edit Profile{% endblock %} {% block
+content %}
+
+<div class="h1 mt-2 text-center">Edit Profile</div>
+
+<form method="post">
+  {{ form.hidden_tag() }} {% for field in form if field.widget.input_type !=
+  'hidden' and field.name != 'password' %}{% if field.errors %} {% for error in
+  field.errors %}
+  <div class="text-warning">{{ error }}</div>
+  {% endfor %} {% endif %}
+
+  <div class="form-group">
+    {{ field.label }} {% if field.type == 'RadioField' %} {% for choice in field
+    %}
+    <div class="form-check">
+      {{choice(class_="form-check-input")}} {{
+      choice.label(class_="form-check-label") }}
+    </div>
+    {% endfor %} {% elif field.type == 'BooleanField' %}
+    <div class="form-check">
+      <input
+        type="checkbox"
+        class="form-check-input"
+        id="{{ field.id }}"
+        name="{{ field.name }}"
+      />
+      <label class="form-check-label" for="{{ field.id }}"></label>
+    </div>
+    {% else %} {{ field(class_="form-control") }} {% endif %}
+  </div>
+  {% endfor %} {{form.password(placeholder="Enter your password to confirm",
+  class="form-control mb-3")}}
+  <div class="edit-btn-area">
+    <button class="btn btn-success" role="submit">Submit Changes</button>
+    <a href="{{url_for('show_homepage')}}" class="btn btn-warning">Cancel</a>
+  </div>
+</form>
+
+{% endblock %}
