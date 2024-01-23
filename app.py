@@ -93,22 +93,26 @@ def user_logout():
 @app.route("/")
 def show_homepage():
     """Show landing page"""
-    if g.user.pref_indoor or g.user.pref_sunlight or g.user.pref_watering or g.user.pref_edible:
+    if not g.user:
+          return render_template("homeanon.html")
+    
+    if g.user:
+        if g.user.pref_indoor or g.user.pref_sunlight or g.user.pref_watering or g.user.pref_edible:
 
-        pref_plants=fetch_search_terms(pref_indoor=g.user.pref_indoor, pref_edible=g.user.pref_edible, pref_watering=g.user.pref_watering, pref_sunlight=g.user.pref_sunlight)
+            pref_plants=fetch_search_terms(pref_indoor=g.user.pref_indoor, pref_edible=g.user.pref_edible, pref_watering=g.user.pref_watering, pref_sunlight=g.user.pref_sunlight)
 
-        if(len(pref_plants)==0):
-            # find other plants
-            flash("No results found for that term. Try another term", 'warning')
+            if(len(pref_plants)==0):
+                # find other plants
+                flash("No results found for that term. Try another term", 'warning')
+            
+            plants=get_random_plants(pref_plants)
         
-        plants=get_random_plants(pref_plants)
-      
-        return render_template('homeUser.html', plants=plants)
-    elif g.user:
+            return render_template('homeUser.html', plants=plants)
+
         plants=fetch_random_plant_data()
         return render_template('homeUser.html', plants=plants)
-    else:
-        return render_template("homeanon.html")
+
+       
     
 @app.route("/search")
 def search():
