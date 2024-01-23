@@ -1,3 +1,6 @@
+.card-img-top {
+  border: none;
+}
 .homepage-textbox {
   color: #567174;
 }
@@ -15,11 +18,33 @@
   color: #567174;
   animation: bubble 0.4s ease-out;
 }
+.adv-search-btn:hover {
+  cursor: pointer;
+}
+.adv-search-form-v {
+  visibility: visible;
+  display: block;
+}
+.adv-search-form-h {
+  visibility: hidden;
+  display: none;
+}
 
 .unfaved {
   color: #d1d1d1;
 }
-
+.unfaved:hover {
+  color: tomato;
+  background-color: whitesmoke;
+}
+.unfaved:active {
+  color: tomato;
+}
 .faved {
   color: tomato;
+}
+
+.faved:hover,
+.faved:active {
+  color: #d1d1d1;
 }

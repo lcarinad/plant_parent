@@ -30,17 +30,17 @@ content%}
 
             <div class="col-2">
               <form action="" class="like">
-                {% if session[FAVES] %} {% if result.id in session[FAVES] %}
+                {% if result.id in session[FAVES] %}
                 <button
-                  class="btn btn-lg fave-btn faved"
+                  class="btn btn-light btn-sm rounded-circle fave-btn faved"
                   id="{{result.id}}"
                   role="submit"
                 >
                   <i class="fa-solid fa-heart"></i>
                 </button>
-                {% endif %} {% else %}
+                {% else %}
                 <button
-                  class="btn btn-lg fave-btn unfaved"
+                  class="btn btn-light btn-sm rounded-circle fave-btn unfaved"
                   id="{{result.id}}"
                   role="submit"
                 >

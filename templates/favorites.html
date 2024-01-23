@@ -4,54 +4,42 @@ content%}
 <div class="lead text-start" style="color: #868484">
   Parents claim no favorites, but with plants, we break the rules
 </div>
-
-<table class="table">
-  <thead>
-    <tr>
-      <th scope="col">Image</th>
-      <th scope="col">Name</th>
-      <th scope="col">Sunlight</th>
-      <th scope="col">Watering</th>
-    </tr>
-  </thead>
-
-  <tbody>
-    {%for fave in favorites %}
-    <tr>
-      <td>
-        <img
-          src="{{fave.image}}"
-          class="img-thumbnail"
-          style="width: 200px; height: 200px"
-          alt="image for {{fave.name}}"
-        />
-      </td>
-      <td>
+<div class="row row-cols-1 row-cols-md-3 g-4">
+  {%for fave in favorites %}
+  <div class="col">
+    <div class="card text-start" style="width: 18rem">
+      <img
+        class="card-img-top img-thumbnail"
+        src="{{fave.image}}"
+        alt="image for {{fave.name}}"
+      />
+      <div class="card-img-overlay">
+        <form class="like" action="">
+          <button
+            id="{{fave.id}}"
+            role="submit"
+            class="btn btn-light btn-sm rounded-circle fave-btn unfaved"
+          >
+            <i class="fa-solid fa-heart"></i>
+          </button>
+        </form>
+      </div>
+      <div class="card-body text-center z-3">
+        <a href="{{url_for('show_plant', plant_id=fave.id)}}">
+          <h5 class="card-title">{{fave.name.title()}}</h5></a
+        >
         <div class="row">
-          <div class="col-10">
-            <a href="{{url_for('show_plant', plant_id=fave.id)}}"
-              >{{fave.name}}</a
-            >
+          <div class="col">
+            <span class="card-text">Full Sun</span>
           </div>
-          <div class="col-2">
-            <form class="like" action="">
-              <button
-                class="btn btn-lg fave-btn faved"
-                id="{{fave.id}}"
-                role="submit"
-              >
-                <i class="fa-solid fa-heart"></i>
-              </button>
-            </form>
+          <div class="col">
+            <span class="card-text">Frequent</span>
           </div>
         </div>
-      </td>
-      <td>NA</td>
-      <td>NA</td>
-    </tr>
-    {% endfor %}
-  </tbody>
-</table>
+      </div>
+    </div>
+  </div>
 
-{% for plant in favorites %} {% include 'plant_card.html' %} {% endfor %} {%
-endblock %}
+  {% endfor %}
+</div>
+{% endblock %}

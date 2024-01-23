@@ -23,7 +23,7 @@ def add_user_to_global():
     """If user logged in, add curr user to Flask global."""
     if CURR_USER_KEY in session:
         g.user = User.query.get(session[CURR_USER_KEY])
-
+        print(f"***********g_favorite_id:{g.user.favorites}")
     else:
         g.user = None
 
@@ -33,8 +33,6 @@ def add_user_to_sess(user):
 
     if user.favorites:
         session[FAVES] = [plant.id for plant in user.favorites]
-        print(f"**************************{session[FAVES]}")
-
 def logout_user():
     """Logout user."""
     if CURR_USER_KEY in session:

@@ -38,3 +38,7 @@ function handleUnexpectedStatus(req) {
 function handleError(error) {
   console.error("An error occurred:", error);
 }
+
+$(".adv-search-btn").on("click", function (e) {
+  $(".adv-search-div").toggleClass("adv-search-form-h adv-search-form-v");
+});
