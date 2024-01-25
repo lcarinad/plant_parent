@@ -3,7 +3,7 @@ content %}
 
 <div class="h1 mt-2 text-center">We are going to need some info!</div>
 
-<form method="post">
+<form action="/signup" method="post">
   {{ form.hidden_tag() }} {% for field in form if field.widget.input_type !=
   'hidden' %}{% if field.errors %} {% for error in field.errors %}
   <div class="text-warning">{{ error }}</div>
@@ -29,7 +29,7 @@ content %}
     {% else %} {{ field(class_="form-control") }} {% endif %}
   </div>
   {% endfor %}
-  <button class="btn btn-primary">Submit</button>
+  <button class="btn btn-primary mt-2">Submit</button>
 </form>
 
 {% endblock %}

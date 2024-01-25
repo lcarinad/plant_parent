@@ -1,36 +1,50 @@
-let $likeForm = $(".like");
 let $faveBtn = $(".fave-btn");
+let url = "http://127.0.0.1:5000";
 
-$likeForm.on("click", ".fave-btn", async function (e) {
+$faveBtn.on("click", async function (e) {
   e.preventDefault();
-  let plant_id = $(this).attr("id");
-
   try {
+    console.log($(this));
     if ($(this).hasClass("faved")) {
-      let delReq = await axios.post(
-        `http://127.0.0.1:5000/delete_favorite/${plant_id}`
-      );
-      if (delReq.status === 200) {
-        $(this).toggleClass("faved unfaved");
-        console.log(`Toggled ${$(this)} to unfaved class`);
-      } else {
-        handleUnexpectedStatus(delReq);
-      }
+      await delFave($(this));
     } else {
-      let addReq = await axios.post(
-        `http://127.0.0.1:5000/add_favorite/${plant_id}`
-      );
-      if (addReq.status === 201) {
-        $(this).toggleClass("faved");
-        console.log(`Toggled ${$(this)} to faved class`);
-      } else {
-        handleUnexpectedStatus(addReq);
-      }
+      await addFave($(this));
     }
   } catch (error) {
     handleError(error);
   }
 });
+
+async function delFave(plant) {
+  let plant_id = plant.attr("id");
+  try {
+    let delRes = await axios.post(`${url}/delete_favorite/${plant_id}`);
+    if (delRes.status === 200) {
+      plant.toggleClass("unfaved").removeClass("faved");
+      console.log("this plant is now unfaved");
+    } else {
+      handleUnexpectedStatus(delRes);
+    }
+  } catch (error) {
+    handleError(error);
+  }
+}
+
+async function addFave(plant) {
+  let plant_id = plant.attr("id");
+  try {
+    let addRes = await axios.post(`${url}/add_favorite/${plant_id}`);
+    if (addRes.status === 201) {
+      plant.toggleClass("faved").removeClass("unfaved");
+      console.log("this plant is now ❤️faved");
+    } else {
+      handleUnexpectedStatus(addRes);
+    }
+  } catch (error) {
+    handleError(error);
+  }
+}
+
 function handleUnexpectedStatus(req) {
   console.log(`Unexpected status code. Response:`, req);
 }
@@ -41,18 +55,4 @@ function handleError(error) {
 
 $(".adv-search-btn").on("click", function (e) {
   $(".adv-search-div").toggleClass("adv-search-form-h adv-search-form-v");
-});
-
-// ****************pagination for list page********************************
-let $p1 = $(".p1");
-let $p2 = $(".p2");
-let $p3 = $(".p3");
-let $prev = $(".prev");
-let $next = $(".next");
-
-$(".page-link").on("click", function (e) {
-  if ($(this).hasClass("p2")) {
-    let p_num = 2;
-    axios.get(`http://127.0.0.1:5000/plant_list/${p_num}`);
-  }
 });

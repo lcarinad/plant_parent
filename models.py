@@ -79,5 +79,5 @@ class Favorite(db.Model):
     """Mapping a user to their favorited plants"""
     __tablename__ = "favorites"
     user_id = db.Column(db.Integer, db.ForeignKey('users.id', ondelete='cascade'),primary_key=True)
-    plant_id = db.Column(db.Integer, db.ForeignKey('plants.id'),primary_key=True)
+    api_id=db.Column(db.Integer, db.ForeignKey('plants.api_id'), primary_key=True)
 

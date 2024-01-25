@@ -1,11 +1,11 @@
 from flask import Flask, render_template, flash, redirect, g, session, url_for, request, jsonify
 from helpers import fetch_random_plant_data, fetch_search_terms, fetch_plant_details, get_logout_msg, add_plant, get_random_plants
-from sqlalchemy.exc import IntegrityError
+from sqlalchemy.exc import IntegrityError, NoResultFound
 from models import db, connect_db, User, Plant, Favorite
 from forms import SignupForm, LoginForm, EditProfileForm
 
 CURR_USER_KEY = "curr_user"
-FAVES="curr_user_faves"
+# FAVES="curr_user_faves"
 
 app= Flask(__name__)
 
@@ -31,8 +31,11 @@ def add_user_to_sess(user):
     """Add login user to session"""
     session[CURR_USER_KEY]=user.id
 
-    if user.favorites:
-        session[FAVES] = [plant.id for plant in user.favorites]
+    # session.setdefault(FAVES,[])
+
+    # if user.favorites:
+    #     session[FAVES] = [plant.api_id for plant in user.favorites]
+
 def logout_user():
     """Logout user."""
     if CURR_USER_KEY in session:
@@ -54,7 +57,7 @@ def signup():
 
             add_user_to_sess(user)
             add_user_to_global()
-            return redirect(url_for("show_homepage"))
+            return render_template("homeUser.html")
         
         except IntegrityError as e:
             error_message = str(e)
@@ -89,6 +92,31 @@ def user_logout():
     logout_user()
     flash(get_logout_msg(), "success")
     return redirect(url_for('show_homepage'))
+
+@app.route('/users/profile/<int:user_id>/edit', methods=["GET", "POST"])
+def edit_profile(user_id):
+    """Update profile for current user"""
+    if not g.user:
+        flash("You must login to edit your profile", "danger")
+        return redirect(url_for(user_login))
+    
+    form = EditProfileForm(obj=g.user)
+    if form.validate_on_submit():
+        user = User.authenticate(form.username.data, form.password.data)
+        if user:
+                user.username=form.username.data
+                user.email=form.email.data
+                user.pref_indoor=form.pref_indoor.data
+                user.pref_edible=form.pref_edible.data
+                user.pref_sunlight=form.pref_sunlight.data
+                user.pref_watering=form.pref_watering.data
+
+                db.session.commit()
+                flash("You updated your profile!", "success")
+                return redirect(url_for("show_homepage"))
+        else:
+             flash("Invalid Password. Please enter your correct password", "danger")
+    return render_template("edit.html", form=form)
 ####################################
 @app.route("/")
 def show_homepage():
@@ -111,9 +139,7 @@ def show_homepage():
 
         plants=fetch_random_plant_data()
         return render_template('homeUser.html', plants=plants)
-
-       
-    
+        
 @app.route("/search")
 def search():
     """Handle search query"""
@@ -145,55 +171,57 @@ def show_all_plants(p_num=1):
     
     plant_data=fetch_search_terms(order='asc', page=p_num)
     return render_template('list.html', plants=plant_data, page=p_num)
-
+# ********************Favorite Routes**************************************
 @app.route("/add_favorite/<int:plant_id>", methods=["POST"])
 def add_favorite(plant_id):
-    """Check to see if plant is in db.  If not add plant to db.  Add plant to favorite"""
-
-    if g.user:
-
-        user_id=g.user.id
-        user = User.query.get(user_id)
+    """Check to see if plant is in db (please note plant_id arg is id from perenual api).  If not add plant to db.  Add plant to favorite"""
+    if not g.user:
+        flash("You must login to favorite a plant.", "danger")
+        return redirect(url_for("user_login"))
+    try:
+        user = User.query.get(g.user.id)
         plant= Plant.query.filter_by(api_id=plant_id).first()
 
-        if plant:
-            user.favorites.append(plant) 
-            
-        else:
+        if not plant:
             plant_data=fetch_plant_details(plant_id)
             plant=add_plant(plant_data)           
-            db.session.commit()
-            user.favorites.append(plant)
-
+            
+        user.favorites.append(plant) 
         db.session.commit()
-        
-        add_fave_to_session(plant)
-        return jsonify({"msg":"Success"}), 201
-    else:
-        flash("You must login to favorite a plant.", "danger")
-        return jsonify({"error":"User is not logged in"}), 401
+        print(f"******************faves:{user.favorites}")       
 
+        return jsonify({"msg":"Success"}), 201
+    except IntegrityError:
+        flash("You already favorited this plant.", "warning")
+        return redirect(url_for("show_homepage"))
+ 
 @app.route("/delete_favorite/<int:plant_id>", methods=["POST"])
 def delete_favorite(plant_id):
     """Delete previously faved plant from db"""
-    if g.user:
-        curr_user_id=g.user.id
-        plant=Plant.query.filter_by(api_id=plant_id).one()
-        faved_plant=Favorite.query.filter(Favorite.user_id==curr_user_id, Favorite.plant_id==plant.id).one()
-        db.session.delete(faved_plant)
-        db.session.commit()
-        remove_fave_from_session(plant)
-
-        return jsonify({"msg":"Success, object deleted"}, 200)
+    try:
+        if g.user:
+            faved_plant=Favorite.query.filter(Favorite.user_id==g.user.id, Favorite.api_id==plant_id).one()
+            db.session.delete(faved_plant)
+            db.session.commit()
+            return jsonify({"msg":"Success, object deleted"}, 200)
+        else:
+            flash("Unauthorized access, please login.", "danger")
+            return redirect(url_for("user_login"))  
+    except NoResultFound:
+        return jsonify({"msg":"Error:Fave not found"}, 400)
     
 @app.route("/users/<int:user_id>/favorites")    
 def view_favorites(user_id):
     """Show list of user's favorited plants"""
     if not g.user:
         flash("You must login to view your favorite plant babies.", "danger")
-        return redirect(url_for(user_login))
+        return redirect(url_for("user_login"))
+
     user=User.query.get_or_404(user_id)
     favorites=user.favorites
+    if not favorites:
+         flash("You don't have any plants favorited at this time.", "info")
+         return redirect(url_for("show_homepage"))
     fave_info_list=[]
     for fave in favorites:
         fave_info={
@@ -204,41 +232,17 @@ def view_favorites(user_id):
         fave_info_list.append(fave_info)
 
     return render_template('/favorites.html', favorites=fave_info_list)
-     
-@app.route('/users/profile/<int:user_id>/edit', methods=["GET", "POST"])
-def edit_profile(user_id):
-    """Update profile for current user"""
-    if not g.user:
-        flash("You must login to edit your profile", "danger")
-        return redirect(url_for(user_login))
-    
-    form = EditProfileForm(obj=g.user)
-    if form.validate_on_submit():
-        user = User.authenticate(form.username.data, form.password.data)
-        if user:
-                user.username=form.username.data
-                user.email=form.email.data
-                user.pref_indoor=form.pref_indoor.data
-                user.pref_edible=form.pref_edible.data
-                user.pref_sunlight=form.pref_sunlight.data
-                user.pref_watering=form.pref_watering.data
 
-                db.session.commit()
-                flash("You updated your profile!", "success")
-                return redirect(url_for("show_homepage"))
-        else:
-             flash("Invalid Password. Please enter your correct password", "danger")
-    return render_template("edit.html", form=form)
+# def add_fave_to_session(plant):
+#     """Add a favorited plant to the users favorites in the session"""
 
-def add_fave_to_session(plant):
-    """Add a favorited plan to the users favorites in the session"""
-    if FAVES not in session:
-        session[FAVES]=[]
-    
-    session[FAVES].append(plant.id)
+#     session[FAVES].append(plant.api_id)
+#     print(f"*************faves:{session[FAVES]}")
 
-def remove_fave_from_session(plant):
-    """Remove and unfavorited plant from the user's favorites in the session"""
-    if FAVES in session:
-        if plant.id in session[FAVES]:
-                               session[FAVES].remove(plant.id)
+
+# def remove_fave_from_session(plant_api_id):
+#     """Remove and unfavorited plant from the user's favorites in the session"""
+#     session[FAVES].remove(plant_api_id)
+
+
+
