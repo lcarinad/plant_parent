@@ -17,5 +17,5 @@ class EditProfileForm(SignupForm):
 
     pref_indoor=BooleanField("Show me only indoor plants", validators=[Optional()])
     pref_edible=BooleanField("Show me only edible plants",  validators=[Optional()])
-    pref_sunlight=RadioField("Sunlight Amount", choices=[('full_shade', "Full Shade"), ('part_shade', "Part Shade"), ("sun-part_shade", "Mixed Sun & Shade"), ("full_sun", "Full Sun")], validators=[Optional()])
-    pref_watering=RadioField("Watering Amount",choices=[ ("frequent", ("Frequent")), ("average", "Average"), ("minimum", "Minimum"), ("none", "None")], validators=[Optional()])
+    pref_sunlight=RadioField("Sunlight Amount", choices=[('full_shade', "Full Shade"), ('part_shade', "Part Shade"), ("sun-part_shade", "Mixed Sun & Shade"), ("full_sun", "Full Sun"), ("0", "No Preference")], validators=[Optional()])
+    pref_watering=RadioField("Watering Amount",choices=[ ("frequent", ("Frequent")), ("average", "Average"), ("minimum", "Minimum"), ("none", "None"),("0", "No Preference")], validators=[Optional()])

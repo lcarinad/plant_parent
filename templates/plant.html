@@ -25,7 +25,8 @@ Details{% endblock %} {%block content%}
 
             <div class="col-2">
               <form action="" class="like">
-                {% if plant in g.user.favorites%}
+                {% if g.user.favorites%} {% for faved_plant in
+                g.user.favorites%} {% if plant.id == faved_plant.api_id%}
                 <button
                   class="btn btn-light btn-sm rounded-circle fave-btn faved"
                   id="{{plant.id}}"
@@ -33,7 +34,7 @@ Details{% endblock %} {%block content%}
                 >
                   <i class="fa-solid fa-heart"></i>
                 </button>
-                {% else %}
+                {% endif %} {% endfor %} {% else %}
                 <button
                   class="btn btn-light btn-sm rounded-circle fave-btn unfaved"
                   id="{{plant.id}}"

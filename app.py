@@ -109,7 +109,7 @@ def edit_profile(user_id):
                 return redirect(url_for("show_homepage"))
         else:
              flash("Invalid Password. Please enter your correct password", "danger")
-    return render_template("edit.html", form=form)
+    return render_template("edit.html", form=form, user_id=g.user.id)
 ####################################
 @app.route("/")
 def show_homepage():
@@ -119,15 +119,16 @@ def show_homepage():
     
     if g.user:
         if g.user.pref_indoor or g.user.pref_sunlight or g.user.pref_watering or g.user.pref_edible:
-
+            print(f"****************pref:{g.user.pref_indoor} {g.user.pref_sunlight}")
             pref_plants=fetch_search_terms(pref_indoor=g.user.pref_indoor, pref_edible=g.user.pref_edible, pref_watering=g.user.pref_watering, pref_sunlight=g.user.pref_sunlight)
 
             if(len(pref_plants)==0):
-                # find other plants
-                flash("No results found for that term. Try another term", 'warning')
+                
+                flash("No plants were found matches your preferences.  Try different filters.", 'warning')
+                return redirect(url_for("edit_profile", user_id=g.user.id))
             
             plants=get_random_plants(pref_plants)
-        
+
             return render_template('homeUser.html', plants=plants)
 
         plants=fetch_random_plant_data()
@@ -151,7 +152,6 @@ def search():
 @app.route("/details/<int:plant_id>")
 def show_plant(plant_id):
     """Show details for specific plant.  Note plant_id is id property from Perenual Api."""
-
     plant_data = fetch_plant_details(plant_id)
     if(plant_data) == None:
         flash("Details on that plant are not available at the moment.", 'warning')
@@ -194,9 +194,7 @@ def delete_favorite(plant_id):
     """Remove plant from users favorites. Plant_id is api id."""
     try:
         if g.user:
-            print(f"**************plant_id:{plant_id}")
             plant= Plant.query.filter(Plant.api_id == plant_id).first()
-            print(f"**************plant:{plant}")
             faved_plant=Favorite.query.filter(Favorite.user_id==g.user.id, Favorite.plant_id==plant.id).one()
             db.session.delete(faved_plant)
             db.session.commit()

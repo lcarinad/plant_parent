@@ -157,8 +157,13 @@ content%}
   </form>
 </div>
 <!-- ******************our picks*********** -->
-
+<!-- special note: plant.id is being set from api so id refers to api_id -->
+{% if g.user.pref_indoor or g.user.pref_sunlight or g.user.pref_watering or
+g.user.pref_edible%}
+<h4 class="text-start">our picks based on your preferences:</h4>
+{% else %}
 <h4 class="text-start">our picks:</h4>
+{% endif %}
 <div class="row row-cols-1 row-cols-md-3 g-4">
   {% for plant in plants %}
   <div class="col">
@@ -173,13 +178,14 @@ content%}
       <img
         class="card-img-top img-thumbnail"
         src="https://upload.wikimedia.org/wikipedia/commons/d/d1/Image_not_available.png?20210219185637"
-        alt="no image available logo"
+        alt="no image available logo for {{plant.common_name}}"
       />
       {% endif %}
 
       <div class="card-img-overlay">
         <form class="like" action="">
-          {% if plant in g.user.favorites %}
+          {% if g.user.favorites %} {% for faved_plant in g.user.favorites %} {%
+          if plant.id == faved_plant.api_id %}
           <button
             id="{{plant.id}}"
             role="submit"
@@ -188,7 +194,7 @@ content%}
             <i class="fa-solid fa-heart"></i>
           </button>
 
-          {% else %}
+          {% endif %} {% endfor %} {% else %}
           <button
             class="btn btn-light btn-sm rounded-circle fave-btn unfaved"
             id="{{plant.id}}"
@@ -199,7 +205,7 @@ content%}
           {% endif %}
         </form>
       </div>
-      <div class="card-body text-center z-3">
+      <div class="card-body text-center z-3 overflow-auto">
         <a href="{{url_for('show_plant', plant_id=plant.id)}}">
           <h5 class="card-title">{{plant.common_name.title()}}</h5></a
         >
