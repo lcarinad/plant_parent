@@ -20,8 +20,13 @@ async function delFave(plant) {
   try {
     let delRes = await axios.post(`${url}/delete_favorite/${plant_id}`);
     if (delRes.status === 200) {
+      console.log(delRes);
       plant.toggleClass("unfaved").removeClass("faved");
-      console.log("this plant is now unfaved");
+      let url = $(location)[0].href;
+      console.log(url);
+      if (url.includes("favorites")) {
+        plant.closest(".card").remove();
+      }
     } else {
       handleUnexpectedStatus(delRes);
     }

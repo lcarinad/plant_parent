@@ -1,5 +1,5 @@
-{% extends 'base.html' %} {% block title %}{{search_term}}{% endblock %} {%block
-content%}
+{% extends 'base.html' %} {% block title %}{{search_term}} Search{% endblock %}
+{%block content%}
 
 <!-- ******************results*********** -->
 <h4 class="text-start">results for {{search_term}}:</h4>
@@ -30,7 +30,7 @@ content%}
 
             <div class="col-2">
               <form action="" class="like">
-                {% if result.id in session[FAVES] %}
+                {% if result in g.user.favorites %}
                 <button
                   class="btn btn-light btn-sm rounded-circle fave-btn faved"
                   id="{{result.id}}"

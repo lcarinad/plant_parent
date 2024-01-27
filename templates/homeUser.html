@@ -179,11 +179,11 @@ content%}
 
       <div class="card-img-overlay">
         <form class="like" action="">
-          {% if plant.id in session[FAVES] %}
+          {% if plant in g.user.favorites %}
           <button
             id="{{plant.id}}"
             role="submit"
-            class="btn btn-light btn-sm rounded-circle fave-btn unfaved"
+            class="btn btn-light btn-sm rounded-circle fave-btn faved"
           >
             <i class="fa-solid fa-heart"></i>
           </button>

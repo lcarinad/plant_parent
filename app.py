@@ -5,7 +5,6 @@ from models import db, connect_db, User, Plant, Favorite
 from forms import SignupForm, LoginForm, EditProfileForm
 
 CURR_USER_KEY = "curr_user"
-# FAVES="curr_user_faves"
 
 app= Flask(__name__)
 
@@ -23,18 +22,12 @@ def add_user_to_global():
     """If user logged in, add curr user to Flask global."""
     if CURR_USER_KEY in session:
         g.user = User.query.get(session[CURR_USER_KEY])
-
     else:
         g.user = None
 
 def add_user_to_sess(user):
     """Add login user to session"""
     session[CURR_USER_KEY]=user.id
-
-    # session.setdefault(FAVES,[])
-
-    # if user.favorites:
-    #     session[FAVES] = [plant.api_id for plant in user.favorites]
 
 def logout_user():
     """Logout user."""
@@ -57,7 +50,7 @@ def signup():
 
             add_user_to_sess(user)
             add_user_to_global()
-            return render_template("homeUser.html")
+            return redirect("/")
         
         except IntegrityError as e:
             error_message = str(e)
@@ -157,7 +150,7 @@ def search():
 
 @app.route("/details/<int:plant_id>")
 def show_plant(plant_id):
-    """Show details for specific plant"""
+    """Show details for specific plant.  Note plant_id is id property from Perenual Api."""
 
     plant_data = fetch_plant_details(plant_id)
     if(plant_data) == None:
@@ -174,33 +167,37 @@ def show_all_plants(p_num=1):
 # ********************Favorite Routes**************************************
 @app.route("/add_favorite/<int:plant_id>", methods=["POST"])
 def add_favorite(plant_id):
-    """Check to see if plant is in db (please note plant_id arg is id from perenual api).  If not add plant to db.  Add plant to favorite"""
+    """Add plant to favorites list"""
     if not g.user:
         flash("You must login to favorite a plant.", "danger")
         return redirect(url_for("user_login"))
     try:
-        user = User.query.get(g.user.id)
         plant= Plant.query.filter_by(api_id=plant_id).first()
 
         if not plant:
+            """Add plant to db if not there"""
             plant_data=fetch_plant_details(plant_id)
-            plant=add_plant(plant_data)           
-            
-        user.favorites.append(plant) 
+            plant=add_plant(plant_data)      
+            db.session.commit()     
+        user_id=g.user.id
+        Favorite.add_fave(user_id=user_id, plant_id=plant.id, plant_api_id=plant.api_id)
         db.session.commit()
-        print(f"******************faves:{user.favorites}")       
 
         return jsonify({"msg":"Success"}), 201
+    
     except IntegrityError:
         flash("You already favorited this plant.", "warning")
         return redirect(url_for("show_homepage"))
  
 @app.route("/delete_favorite/<int:plant_id>", methods=["POST"])
 def delete_favorite(plant_id):
-    """Delete previously faved plant from db"""
+    """Remove plant from users favorites. Plant_id is api id."""
     try:
         if g.user:
-            faved_plant=Favorite.query.filter(Favorite.user_id==g.user.id, Favorite.api_id==plant_id).one()
+            print(f"**************plant_id:{plant_id}")
+            plant= Plant.query.filter(Plant.api_id == plant_id).first()
+            print(f"**************plant:{plant}")
+            faved_plant=Favorite.query.filter(Favorite.user_id==g.user.id, Favorite.plant_id==plant.id).one()
             db.session.delete(faved_plant)
             db.session.commit()
             return jsonify({"msg":"Success, object deleted"}, 200)
@@ -208,6 +205,7 @@ def delete_favorite(plant_id):
             flash("Unauthorized access, please login.", "danger")
             return redirect(url_for("user_login"))  
     except NoResultFound:
+        flash("This plant is not in your favorites list.", "warning")
         return jsonify({"msg":"Error:Fave not found"}, 400)
     
 @app.route("/users/<int:user_id>/favorites")    
@@ -232,17 +230,3 @@ def view_favorites(user_id):
         fave_info_list.append(fave_info)
 
     return render_template('/favorites.html', favorites=fave_info_list)
-
-# def add_fave_to_session(plant):
-#     """Add a favorited plant to the users favorites in the session"""
-
-#     session[FAVES].append(plant.api_id)
-#     print(f"*************faves:{session[FAVES]}")
-
-
-# def remove_fave_from_session(plant_api_id):
-#     """Remove and unfavorited plant from the user's favorites in the session"""
-#     session[FAVES].remove(plant_api_id)
-
-
-

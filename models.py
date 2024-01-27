@@ -79,5 +79,12 @@ class Favorite(db.Model):
     """Mapping a user to their favorited plants"""
     __tablename__ = "favorites"
     user_id = db.Column(db.Integer, db.ForeignKey('users.id', ondelete='cascade'),primary_key=True)
-    api_id=db.Column(db.Integer, db.ForeignKey('plants.api_id'), primary_key=True)
+    plant_id=db.Column(db.Integer, db.ForeignKey('plants.id'), primary_key=True)
+    plant_api_id=db.Column(db.Integer, nullable=False)
 
+    @classmethod
+    def add_fave(cls, user_id, plant_id, plant_api_id):
+        """Add user favorite to db"""
+        new_fave=Favorite(user_id=user_id, plant_id=plant_id, plant_api_id=plant_api_id)
+        db.session.add(new_fave)
+        return new_fave

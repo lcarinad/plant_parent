@@ -15,21 +15,11 @@ content%}
       />
       <div class="card-img-overlay">
         <form class="like" action="">
-          {% if fave.id in session[FAVES] %}
           <button
             id="{{fave.id}}"
             role="submit"
             class="btn btn-light btn-sm rounded-circle fave-btn faved"
           >
-            <i class="fa-solid fa-heart"></i>
-          </button>
-          {% else %}
-          <button
-            id="{{fave.id}}"
-            role="submit"
-            class="btn btn-light btn-sm rounded-circle fave-btn unfaved"
-          >
-            {% endif %}
             <i class="fa-solid fa-heart"></i>
           </button>
         </form>

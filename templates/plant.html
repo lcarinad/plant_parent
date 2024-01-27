@@ -25,7 +25,7 @@ Details{% endblock %} {%block content%}
 
             <div class="col-2">
               <form action="" class="like">
-                {% if plant.id in session[FAVES]%}
+                {% if plant in g.user.favorites%}
                 <button
                   class="btn btn-light btn-sm rounded-circle fave-btn faved"
                   id="{{plant.id}}"
