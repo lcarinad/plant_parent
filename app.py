@@ -118,15 +118,13 @@ def show_homepage():
           return render_template("homeanon.html")
     
     if g.user:
+        for plant in g.user.favorites:
+            print(f"****************faves:{ plant.api_id}")
         if g.user.pref_indoor or g.user.pref_sunlight or g.user.pref_watering or g.user.pref_edible:
-            print(f"****************pref:{g.user.pref_indoor} {g.user.pref_sunlight}")
             pref_plants=fetch_search_terms(pref_indoor=g.user.pref_indoor, pref_edible=g.user.pref_edible, pref_watering=g.user.pref_watering, pref_sunlight=g.user.pref_sunlight)
-
-            if(len(pref_plants)==0):
-                
+            if(len(pref_plants)==0):              
                 flash("No plants were found matches your preferences.  Try different filters.", 'warning')
-                return redirect(url_for("edit_profile", user_id=g.user.id))
-            
+                return redirect(url_for("edit_profile", user_id=g.user.id))            
             plants=get_random_plants(pref_plants)
 
             return render_template('homeUser.html', plants=plants)
@@ -214,17 +212,23 @@ def view_favorites(user_id):
         return redirect(url_for("user_login"))
 
     user=User.query.get_or_404(user_id)
-    favorites=user.favorites
+    favorites=Favorite.query.filter(Favorite.user_id==user.id).all()
     if not favorites:
          flash("You don't have any plants favorited at this time.", "info")
-         return redirect(url_for("show_homepage"))
-    fave_info_list=[]
-    for fave in favorites:
-        fave_info={
-             'id':fave.api_id,
-              'name':fave.name,
-              'image':fave.image_url
-         }
-        fave_info_list.append(fave_info)
+    #      return redirect(url_for("show_homepage"))
+    # fave_info_list=[]
+    # for fave in favorites:
+    #     fave_info={
+    #          'id':fave.api_id,
+    #           'name':fave.name,
+    #           'image':fave.image_url
+    #      }
+    #     fave_info_list.append(fave_info)
+    fave_plants=[]
 
-    return render_template('/favorites.html', favorites=fave_info_list)
+    for fave in favorites:
+        plant=Plant.query.get(fave.plant_id)
+
+        fave_plants.append(plant)
+
+    return render_template('/favorites.html', favorites=fave_plants)

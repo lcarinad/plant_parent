@@ -35,7 +35,6 @@ def fetch_search_terms(term=None,pref_indoor=None, pref_edible=None, pref_wateri
     payload={'key':key,'q':term,'indoor':pref_indoor,'edible':pref_edible,'watering':pref_watering, 'sunlight':pref_sunlight,'order':order, 'page':page }
 
     response = requests.get(f"https://perenual.com/api/species-list", params=payload)
-    print(f"**********************url to api:{response.url}")
     unusable_results=response.json().get('data',[])
     results=[]
 
@@ -66,6 +65,12 @@ def add_plant(plant_data):
     
     api_id=plant_data.get('id')
     name=plant_data.get('common_name')
+    watering_freq=plant_data.get('watering')
+    watering_benchmark=plant_data.get("watering_general_benchmark")
+    if watering_benchmark:
+        watering_value = watering_benchmark.get("value", "N/A")
+        watering_unit = watering_benchmark.get("unit", "N/A")
+    sunlight=plant_data.get("sunlight")
     image_na_url="https://upload.wikimedia.org/wikipedia/commons/d/d1/Image_not_available.png?20210219185637"
 
     default_image=plant_data.get('default_image')
@@ -74,5 +79,5 @@ def add_plant(plant_data):
     if default_image and 'thumbnail' in default_image:
         image_url = default_image['thumbnail']
 
-    plant=Plant.add_plant(api_id=api_id, name=name, image_url=image_url)
+    plant=Plant.add_plant(api_id=api_id, name=name, image_url=image_url, watering_freq=watering_freq, watering_value=watering_value, watering_unit=watering_unit, sunlight=sunlight)
     return plant

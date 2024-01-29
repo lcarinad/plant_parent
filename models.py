@@ -61,6 +61,11 @@ class Plant(db.Model):
     api_id = db.Column(db.Integer, nullable=False, unique=True)   
     name=db.Column(db.String, nullable=False)
     image_url=db.Column(db.String, default="https://upload.wikimedia.org/wikipedia/commons/d/d1/Image_not_available.png?20210219185637")
+    watering_freq=db.Column(db.String, default= "N/A")
+    watering_value=db.Column(db.String, default= "N/A")
+    watering_unit=db.Column(db.String, default="N/A")
+    sunlight=db.Column(db.String, default="N/A")
+
 
     def __repr__(self):
         """Show info about a plant"""
@@ -68,9 +73,9 @@ class Plant(db.Model):
         return f"<Plant_id:{p.id} Plant_api_id:{p.api_id} Name:{p.name}>"
     
     @classmethod
-    def add_plant(cls, api_id, name, image_url):
+    def add_plant(cls, api_id, name, image_url, watering_freq, watering_value, watering_unit, sunlight):
         """Add plant to db"""
-        plant = Plant(api_id=api_id, name=name, image_url=image_url)
+        plant = Plant(api_id=api_id, name=name, image_url=image_url, watering_freq=watering_freq,  watering_value=watering_value, watering_unit=watering_unit, sunlight=sunlight)
         db.session.add(plant)
         return plant
 

@@ -5,35 +5,46 @@ content%}
   Parents claim no favorites, but with plants, we break the rules
 </div>
 <div class="row row-cols-1 row-cols-md-3 g-4">
-  {%for fave in favorites %}
+  {%for plant in favorites %}
   <div class="col">
     <div class="card text-start" style="width: 18rem">
       <img
         class="card-img-top img-thumbnail"
-        src="{{fave.image}}"
-        alt="image for {{fave.name}}"
+        src="{{plant.image_url}}"
+        alt="image for {{plant.name}}"
       />
       <div class="card-img-overlay">
-        <form class="like" action="">
-          <button
-            id="{{fave.id}}"
-            role="submit"
-            class="btn btn-light btn-sm rounded-circle fave-btn faved"
-          >
-            <i class="fa-solid fa-heart"></i>
-          </button>
-        </form>
+        <button
+          id="{{plant.api_id}}"
+          role="submit"
+          class="btn btn-light btn-sm rounded-circle fave-btn faved"
+        >
+          <i class="fa-solid fa-heart"></i>
+        </button>
       </div>
       <div class="card-body text-center z-3">
-        <a href="{{url_for('show_plant', plant_id=fave.id)}}">
-          <h5 class="card-title">{{fave.name.title()}}</h5></a
+        <a href="{{url_for('show_plant', plant_id=plant.api_id)}}">
+          <h5 class="card-title">{{plant.name.title()}}</h5></a
         >
-        <div class="row">
+        <div class="row text-start">
           <div class="col">
-            <span class="card-text">Full Sun</span>
+            <span class="card-text"
+              ><i class="fa-solid fa-sun" style="color: #ffd43b"></i>
+              <p>
+                <b>Amount of Sunlight:</b> {% set sunlight = plant.sunlight |
+                replace('{', '') | replace('}', '') | replace('"', '') %} {{
+                sunlight }}
+              </p>
+            </span>
           </div>
           <div class="col">
-            <span class="card-text">Frequent</span>
+            <span class="card-text">
+              <i class="fa-solid fa-droplet" style="color: #74c0fc"></i>
+              <p>
+                <b>Watering Frequency:</b> {{plant.watering_freq}} watering
+                every {{plant.watering_value}} {{plant.watering_unit}}
+              </p></span
+            >
           </div>
         </div>
       </div>
