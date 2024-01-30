@@ -43,6 +43,7 @@ async function addFave(plant) {
       plant.toggleClass("faved").removeClass("unfaved");
       console.log("this plant is now ❤️faved");
     } else {
+      alert("You must login to favorite a plant!");
       handleUnexpectedStatus(addRes);
     }
   } catch (error) {

@@ -1,20 +1,40 @@
 from flask import Flask, render_template, flash, redirect, g, session, url_for, request, jsonify
+from flask_mailman import Mail, EmailMessage
 from helpers import fetch_random_plant_data, fetch_search_terms, fetch_plant_details, get_logout_msg, add_plant, get_random_plants
 from sqlalchemy.exc import IntegrityError, NoResultFound
 from models import db, connect_db, User, Plant, Favorite
 from forms import SignupForm, LoginForm, EditProfileForm
+# import socket
+
+# mail=Mail()
+
 
 CURR_USER_KEY = "curr_user"
 
 app= Flask(__name__)
 
+# mail.init_app(app)
+
 app.config['SECRET_KEY']='oh-so-secret'
 app.config['SQLALCHEMY_DATABASE_URI']='postgresql:///plant_db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_ECHO'] = False
+# app.config["MAIL_SERVER"]="smtp.gmail.com"
+# app.config["MAIL_PORT"]=465
+# app.config["MAIL_USERNAME"]="delagomusic7305@gmail.com"
+# app.config["MAIL_PASSWORD"]="klafladsjldafadlk12"
+# app.config["MAIL_USE_TLS"]=False
+# app.config["MAIL_USE_SSL"]=True
+
+# Gmail SMTP port: 465 (SSL)/587 (TLS)
+
+
 
 connect_db(app)
 app.app_context().push()
+
+preferences={}
+args=["q", "indoor", "edible", "watering", "sunlight"]
 ################################################################
 #user signup/login/logout
 @app.before_request
@@ -33,6 +53,24 @@ def logout_user():
     """Logout user."""
     if CURR_USER_KEY in session:
         del session[CURR_USER_KEY]
+
+# @app.route('/mail')
+# def index():
+#     timeout = 10
+#     try:
+#         socket.create_connection(("smtp.gmail.com", 465), timeout)
+#         msg = EmailMessage("Here's the Title", "Body of the email", "delagomusic7305@gmail.com", ["lcarinad@gmail.com"])
+#         msg.send()
+#         return '<h1>sent email...</h1>'
+#     except socket.timeout:
+#         return '<h1>Connection timed out. Unable to establish a connection.</h1>'
+#     except Exception as e:
+#         # Handle other connection errors
+#         return f'<h1>Error occurred: {e}</h1>'
+
+
+
+
 
 @app.route("/signup",methods=['POST', 'GET'])
 def signup():
@@ -92,23 +130,21 @@ def edit_profile(user_id):
     if not g.user:
         flash("You must login to edit your profile", "danger")
         return redirect(url_for(user_login))
-    
-    form = EditProfileForm(obj=g.user)
-    if form.validate_on_submit():
-        user = User.authenticate(form.username.data, form.password.data)
-        if user:
-                user.username=form.username.data
-                user.email=form.email.data
-                user.pref_indoor=form.pref_indoor.data
-                user.pref_edible=form.pref_edible.data
-                user.pref_sunlight=form.pref_sunlight.data
-                user.pref_watering=form.pref_watering.data
+    try:
+        form = EditProfileForm(obj=g.user)
+        if form.validate_on_submit():
+            user = User.authenticate(form.username.data, form.password.data)
+            if user:
+                form.populate_obj(user)
 
                 db.session.commit()
                 flash("You updated your profile!", "success")
                 return redirect(url_for("show_homepage"))
-        else:
-             flash("Invalid Password. Please enter your correct password", "danger")
+            else:
+                flash("Invalid Password. Please enter your correct password", "danger")
+    except ValueError:
+        flash("there was an error", "danger")
+        return redirect(url_for("show_homepage"))
     return render_template("edit.html", form=form, user_id=g.user.id)
 ####################################
 @app.route("/")
@@ -118,10 +154,14 @@ def show_homepage():
           return render_template("homeanon.html")
     
     if g.user:
-        for plant in g.user.favorites:
-            print(f"****************faves:{ plant.api_id}")
-        if g.user.pref_indoor or g.user.pref_sunlight or g.user.pref_watering or g.user.pref_edible:
-            pref_plants=fetch_search_terms(pref_indoor=g.user.pref_indoor, pref_edible=g.user.pref_edible, pref_watering=g.user.pref_watering, pref_sunlight=g.user.pref_sunlight)
+        preferences={
+            "indoor": g.user.pref_indoor,
+            "edible": g.user.pref_edible,
+            "watering": g.user.pref_watering,
+            "sunlight": g.user.pref_sunlight
+        }
+        if any(preferences.values()):
+            pref_plants = fetch_search_terms(**preferences)
             if(len(pref_plants)==0):              
                 flash("No plants were found matches your preferences.  Try different filters.", 'warning')
                 return redirect(url_for("edit_profile", user_id=g.user.id))            
@@ -135,17 +175,15 @@ def show_homepage():
 @app.route("/search")
 def search():
     """Handle search query"""
-    term=request.args.get("q")
-    pref_indoor=request.args.get("indoor")
-    pref_edible=request.args.get("edible")
-    pref_watering=request.args.get("watering")
-    pref_sunlight=request.args.get("sunlight")
-    results=fetch_search_terms(term, pref_indoor, pref_edible, pref_watering,pref_sunlight)
-  
+    for arg in args:
+        preferences[arg] = request.args.get(arg)
+    results=fetch_search_terms(**preferences)
+
     if(len(results)==0):
         flash("No results found for that term. Try another term", 'warning')
         return redirect(url_for('show_homepage'))
-    return render_template('search.html', results=results, search_term=term)
+   
+    return render_template('search.html', results=results, search_term=preferences['q'])
 
 @app.route("/details/<int:plant_id>")
 def show_plant(plant_id):
@@ -190,6 +228,9 @@ def add_favorite(plant_id):
 @app.route("/delete_favorite/<int:plant_id>", methods=["POST"])
 def delete_favorite(plant_id):
     """Remove plant from users favorites. Plant_id is api id."""
+    if not g.user:
+        flash("Unauthorized access, please login.", "danger")
+        return redirect(url_for("user_login")) 
     try:
         if g.user:
             plant= Plant.query.filter(Plant.api_id == plant_id).first()
@@ -197,9 +238,7 @@ def delete_favorite(plant_id):
             db.session.delete(faved_plant)
             db.session.commit()
             return jsonify({"msg":"Success, object deleted"}, 200)
-        else:
-            flash("Unauthorized access, please login.", "danger")
-            return redirect(url_for("user_login"))  
+       
     except NoResultFound:
         flash("This plant is not in your favorites list.", "warning")
         return jsonify({"msg":"Error:Fave not found"}, 400)
@@ -215,20 +254,11 @@ def view_favorites(user_id):
     favorites=Favorite.query.filter(Favorite.user_id==user.id).all()
     if not favorites:
          flash("You don't have any plants favorited at this time.", "info")
-    #      return redirect(url_for("show_homepage"))
-    # fave_info_list=[]
-    # for fave in favorites:
-    #     fave_info={
-    #          'id':fave.api_id,
-    #           'name':fave.name,
-    #           'image':fave.image_url
-    #      }
-    #     fave_info_list.append(fave_info)
+
     fave_plants=[]
 
     for fave in favorites:
         plant=Plant.query.get(fave.plant_id)
-
         fave_plants.append(plant)
 
     return render_template('/favorites.html', favorites=fave_plants)

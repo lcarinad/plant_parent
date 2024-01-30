@@ -24,31 +24,30 @@
         src="https://upload.wikimedia.org/wikipedia/commons/d/d1/Image_not_available.png?20210219185637"
         alt="no image available logo for {{result.common_name}}"
       />
-      {% endif %}
-
+      {% endif %} {% for plant in g.user.favorites%} {% if plant.api_id|int ==
+      result.id|int %}
       <div class="card-img-overlay">
-        <form class="like" action="">
-          {% if g.user.favorites %} {% for faved_plant in g.user.favorites%} {%
-          if result.id == faved_plant.api_id%}
-          <button
-            id="{{result.id}}"
-            role="submit"
-            class="btn btn-light btn-sm rounded-circle fave-btn faved"
-          >
-            <i class="fa-solid fa-heart"></i>
-          </button>
-
-          {% endif %} {% endfor %} {% else %}
-          <button
-            class="btn btn-light btn-sm rounded-circle fave-btn unfaved"
-            id="{{result.id}}"
-            role="submit"
-          >
-            <i class="fa-solid fa-heart"></i>
-          </button>
-          {% endif %}
-        </form>
+        <button
+          type="button"
+          class="btn btn-light btn-sm rounded-circle fave-btn faved"
+          id="{{result.id}}"
+          role="submit"
+        >
+          <i class="fa-solid fa-heart"></i>
+        </button>
       </div>
+      {% else %}
+      <div class="card-img-overlay">
+        <button
+          type="button"
+          class="btn btn-light btn-sm rounded-circle fave-btn unfaved"
+          id="{{result.id}}"
+          role="submit"
+        >
+          <i class="fa-solid fa-heart"></i>
+        </button>
+      </div>
+      {% endif %} {% endfor %}
       <div class="card-body text-center z-3 overflow-auto">
         <a href="{{url_for('show_plant', plant_id=result.id)}}">
           <h5 class="card-title">{{result.common_name.title()}}</h5></a
