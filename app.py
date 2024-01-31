@@ -1,10 +1,13 @@
+import os 
+
 from flask import Flask, render_template, flash, redirect, g, session, url_for, request, jsonify
-from flask_mailman import Mail, EmailMessage
+# from flask_mailman import Mail, EmailMessage
 from helpers import fetch_random_plant_data, fetch_search_terms, fetch_plant_details, get_logout_msg, add_plant, get_random_plants
 from sqlalchemy.exc import IntegrityError, NoResultFound
 from models import db, connect_db, User, Plant, Favorite
 from forms import SignupForm, LoginForm, EditProfileForm
 # import socket
+from confid import key
 
 # mail=Mail()
 
@@ -15,10 +18,13 @@ app= Flask(__name__)
 
 # mail.init_app(app)
 
-app.config['SECRET_KEY']='oh-so-secret'
-app.config['SQLALCHEMY_DATABASE_URI']='postgresql:///plant_db'
+
+app.config['SQLALCHEMY_DATABASE_URI']=(os.environ.get('DATABASE_URL','postgresql:///plant_db'))
+                                                      
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_ECHO'] = False
+app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = True
+app.config['SECRET_KEY']=os.environ.get('SECRET_KEY','oh-so-secret')
 # app.config["MAIL_SERVER"]="smtp.gmail.com"
 # app.config["MAIL_PORT"]=465
 # app.config["MAIL_USERNAME"]="delagomusic7305@gmail.com"
@@ -232,12 +238,11 @@ def delete_favorite(plant_id):
         flash("Unauthorized access, please login.", "danger")
         return redirect(url_for("user_login")) 
     try:
-        if g.user:
-            plant= Plant.query.filter(Plant.api_id == plant_id).first()
-            faved_plant=Favorite.query.filter(Favorite.user_id==g.user.id, Favorite.plant_id==plant.id).one()
-            db.session.delete(faved_plant)
-            db.session.commit()
-            return jsonify({"msg":"Success, object deleted"}, 200)
+        plant= Plant.query.filter(Plant.api_id == plant_id).first()
+        faved_plant=Favorite.query.filter(Favorite.user_id==g.user.id, Favorite.plant_id==plant.id).one()
+        db.session.delete(faved_plant)
+        db.session.commit()
+        return jsonify({"msg":"Success, object deleted"}, 200)
        
     except NoResultFound:
         flash("This plant is not in your favorites list.", "warning")
