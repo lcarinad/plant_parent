@@ -257,7 +257,7 @@ def view_favorites(user_id):
     user=User.query.get_or_404(user_id)
     favorites=Favorite.query.filter(Favorite.user_id==user.id).all()
     if not favorites:
-         flash("You don't have any plants favorited at this time.", "info")
+         flash("You do not have any plants favorited at this time.", "info")
 
     fave_plants=[]
 

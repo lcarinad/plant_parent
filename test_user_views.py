@@ -2,6 +2,7 @@
 import os
 from flask import session
 from unittest import TestCase
+from confid import key
 import requests
 from models import db, User, Plant, Favorite
 
@@ -96,36 +97,59 @@ class UserViewsTestCase(TestCase):
             self.assertEqual(resp.status_code, 200)
             self.assertEqual(session['curr_user'],1000 )
 
-    def test_add_favorite(self):
-        """Can a user add a plant to their favorites?"""
-        user=User.query.get(1000)
+    def test_view_favorites_nonauth_user(self):
+        """A user should not have access to view favorites list if they are not signed in"""
         with self.client as client:
             with client.session_transaction() as session:
-                session[CURR_USER_KEY]=user.id
-            self.assertIsNone(Favorite.query.filter_by(user_id=1000, plant_id=2).first())
-            response=client.post("/add_favorite/2", follow_redirects=True)
-            self.assertEqual( '201 CREATED', response.status)
-            self.assertIsNotNone(Favorite.query.filter_by(user_id=1000, plant_id=2).first())
-            self.assertEqual(len(user.favorites), 2)
-
-    def test_add_favorite_nonauth_user(self):
-        """Can a user add a plant to their favorites if they are not signed in"""
-        with self.client as client:
-            with client.session_transaction() as change_session:
-                change_session[CURR_USER_KEY]=None
-            response=client.post("/add_favorite/2", follow_redirects=True)
+                session[CURR_USER_KEY]=None
+            response=client.get(f"/users/1000/favorites", follow_redirects=True)
             html=response.text
-            self.assertIn("You must login to favorite a plant.", html)
-            self.assertEqual(response.request.url, "http://localhost/login")           
-            
-    def test_delete_favorite(self):
-        """Can a user delete a plant from their favorites?"""
+            self.assertIn("You must login to view", html)
+            self.assertEqual(response.request.url, "http://localhost/login")     
+
+
+    def test_search(self):
+        """Can a authorized user search for a plant"""
         user=User.query.get(1000)
         with self.client as client:
             with client.session_transaction() as session:
                 session[CURR_USER_KEY]=user.id
-            self.assertIsNotNone(Favorite.query.filter_by(user_id=1000, plant_id=1).first())
-            response=client.post("/delete_favorite/1", follow_redirects=True)
+            query_string={'q':'maple', 'key':key}
+            response=client.get('/search', query_string=query_string, follow_redirects=True)
+            html=response.text
             self.assertEqual(200, response.status_code)
-            self.assertIsNone(Favorite.query.filter_by(user_id=1000, plant_id=1).first())
-            self.assertEqual(len(user.favorites), 0)
+            self.assertIn("results for maple", html)
+
+    def test_search_nonauth_user(self):
+        """A non-auth user should be able to search for a plant"""
+        with self.client as client:
+            with client.session_transaction() as session:
+                session[CURR_USER_KEY]=None
+            query_string={'q':'fern', 'key':key}
+            response=client.get('/search', query_string=query_string, follow_redirects=True)
+            html=response.text
+            self.assertEqual(200, response.status_code)
+            self.assertIn("results for fern", html)
+
+    def test_see_all_plants(self):
+        """Can an authorized user view all plants"""
+        user=User.query.get(1000)
+        with self.client as client:
+            with client.session_transaction() as session:
+                session[CURR_USER_KEY]=user.id
+            query_string={'key':key}
+            response=client.get('/plantlist/1', query_string=query_string, follow_redirects=True)
+            html=response.text
+            self.assertEqual(response.status_code, 200)
+            self.assertIn("Browse All Plants", html)
+
+    def test_see_all_plants(self):
+        """A non-authorized user should be able to view all plants"""
+        with self.client as client:
+            with client.session_transaction() as session:
+                session[CURR_USER_KEY]=None
+            query_string={'key':key}
+            response=client.get('/plantlist/2', query_string=query_string, follow_redirects=True)
+            html=response.text
+            self.assertEqual(response.status_code, 200)
+            self.assertIn("Browse All Plants", html)
