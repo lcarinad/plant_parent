@@ -41,7 +41,7 @@ async function addFave(plant) {
     let addRes = await axios.post(`${url}/add_favorite/${plant_id}`);
     if (addRes.status === 201) {
       plant.toggleClass("faved").removeClass("unfaved");
-      console.log("this plant is now ❤️faved");
+      console.log(addRes);
     } else {
       alert("You must login to favorite a plant!");
       handleUnexpectedStatus(addRes);
