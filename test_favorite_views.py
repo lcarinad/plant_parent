@@ -3,7 +3,6 @@ import os
 from flask import session
 from unittest import TestCase
 from confid import key
-import requests
 from models import db, User, Plant, Favorite
 
 os.environ['DATABASE_URL']="postgresql:///plant-db-test"
