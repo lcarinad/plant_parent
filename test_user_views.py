@@ -5,6 +5,7 @@ from unittest import TestCase
 from confid import key
 import requests
 from models import db, User, Plant, Favorite
+from sqlalchemy.exc import IntegrityError
 
 os.environ['DATABASE_URL']="postgresql:///plant-db-test"
 
@@ -16,7 +17,7 @@ app.app_context().push()
 app.config['WTF_CSRF_ENABLED'] = False
 
 class UserViewsTestCase(TestCase):
-    """Test user views."""
+    """Test user views incl views that use perenual api"""
     def setUp(self):
         """Add sample user"""
         db.drop_all()
@@ -77,6 +78,7 @@ class UserViewsTestCase(TestCase):
             self.assertEqual(response.status_code, 200)
             self.assertIn("That username is already taken", html)
             self.assertNotIn("Welcome", html)
+            self.assertRaises(IntegrityError)
 
     def test_user_signup_with_existing_email(self):
         """Can user sign up with an existing email?"""
@@ -87,6 +89,7 @@ class UserViewsTestCase(TestCase):
             self.assertEqual(response.status_code, 200)
             self.assertIn("That email address is already registered.", html)
             self.assertNotIn("Welcome", html)
+            self.assertRaises(IntegrityError)
 
     def test_session_info(self):
         """Is user saved in session?"""
@@ -132,7 +135,7 @@ class UserViewsTestCase(TestCase):
             self.assertIn("results for fern", html)
 
     def test_see_all_plants(self):
-        """Can an authorized user view all plants"""
+        """Can an authorized user view all plants?"""
         user=User.query.get(1000)
         with self.client as client:
             with client.session_transaction() as session:
