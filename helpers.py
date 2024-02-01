@@ -30,18 +30,21 @@ def fetch_search_terms(q=None, indoor=None, edible=None, watering=None, sunlight
     """Make get request to return search terms"""
     if edible == True:
         edible=1
+    else:
+        edible=None
     if indoor == True:
         indoor=1
+    else:
+        indoor=None
     payload={'key':key,'q':q,'indoor':indoor,'edible':edible,'watering':watering, 'sunlight':sunlight,'order':order, 'page':page }
 
-    response = requests.get(f"https://perenual.com/api/species-list", params=payload)
-    unusable_results=response.json().get('data',[])
+    response = requests.get("https://perenual.com/api/species-list", params=payload)
+    print(f"********************* url:{response.url}")
+    unUsable_results=response.json().get('data',[])
     results=[]
-
-    for result in unusable_results:
+    for result in unUsable_results:
         if 'id' in result and result['id'] <=3000:
             results.append(result)
-    return results
 
 def fetch_plant_details(plant_id):
     """Make get request to return plant details"""

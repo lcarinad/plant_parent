@@ -42,6 +42,21 @@ class User(db.Model):
         return user
     
     @classmethod
+    def edit_profile(cls, username, email, password, pref_indoor, pref_sunlight, pref_watering, pref_edible):
+        """Edit a user profile"""
+        hashed_pwd = bcrypt.generate_password_hash(password).decode('UTF-8')
+        updated_user = User(
+            username=username,
+            email=email,
+            password=hashed_pwd,
+            pref_indoor=pref_indoor,
+            pref_sunlight=pref_sunlight,
+            pref_watering=pref_watering,
+            pref_edible=pref_edible
+        )
+        return updated_user
+    
+    @classmethod
     def authenticate(cls, username, password):
         """Find user with un and hashed pwd. Returns user object if username and hashed pwd are found, else returns False."""
         user = cls.query.filter_by(username=username).first()
@@ -49,9 +64,8 @@ class User(db.Model):
         if user:
             auth_check=bcrypt.check_password_hash(user.password, password)
             if auth_check:
-                print(f"this user is authorized")
                 return user
-            return False
+        return False
 
 class Plant(db.Model):
     """Plant table"""

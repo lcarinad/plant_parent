@@ -136,19 +136,29 @@ def edit_profile(user_id):
         flash("You must login to edit your profile", "danger")
         return redirect(url_for(user_login))
     try:
+        user=User.query.get(user_id)
+        
+        print(f"*************id:{user.id}")
         form = EditProfileForm(obj=g.user)
         if form.validate_on_submit():
             user = User.authenticate(form.username.data, form.password.data)
             if user:
-                form.populate_obj(user)
-
+                User.edit_profile(
+                        username=form.username.data,
+                        email=form.email.data,
+                        password=form.password.data,
+                        pref_indoor=form.pref_indoor.data,
+                        pref_sunlight=form.pref_sunlight.data,
+                        pref_watering=form.pref_watering.data,
+                        pref_edible=form.pref_edible.data
+                )
                 db.session.commit()
                 flash("You updated your profile!", "success")
                 return redirect(url_for("show_homepage"))
             else:
                 flash("Invalid Password. Please enter your correct password", "danger")
-    except ValueError:
-        flash("there was an error", "danger")
+    except Exception as e:
+        flash(f"An error occurred: {e}", "danger")
         return redirect(url_for("show_homepage"))
     return render_template("edit.html", form=form, user_id=g.user.id)
 ####################################
@@ -165,8 +175,11 @@ def show_homepage():
             "watering": g.user.pref_watering,
             "sunlight": g.user.pref_sunlight
         }
+        user=User.query.get(g.user.id)
+
         if any(preferences.values()):
             pref_plants = fetch_search_terms(**preferences)
+
             if(len(pref_plants)==0):              
                 flash("No plants were found matches your preferences.  Try different filters.", 'warning')
                 return redirect(url_for("edit_profile", user_id=g.user.id))            
