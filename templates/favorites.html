@@ -28,8 +28,20 @@ content%}
         >
         <div class="row text-start">
           <div class="col">
-            <span class="card-text"
-              ><i class="fa-solid fa-sun" style="color: #ffd43b"></i>
+            <span class="card-text">
+              {% if 'deep' in plant.sunlight.lower() or 'full shade' in
+              plant.sunlight.lower() %}
+              <i class="fa-solid fa-cloud" style="color: #89898b"></i>
+              {% elif 'mixed' in plant.sunlight.lower() or 'part shade' in
+              plant.sunlight.lower() or 'filtered' in plant.sunlight.lower() %}
+              <i class="fa-solid fa-cloud-sun" style="color: #ffd43b"></i>
+              {% elif 'full sun' in plant.sunlight.lower() %}
+              <i class="fa-solid fa-sun" style="color: #ffd43b"></i>
+
+              {% else %}
+              <i class="fa-solid fa-sun" style="color: #ffd43b"></i>
+              {% endif %}
+
               <p>
                 <b>Amount of Sunlight:</b> {% set sunlight = plant.sunlight |
                 replace('{', '') | replace('}', '') | replace('"', '') %} {{
@@ -39,7 +51,18 @@ content%}
           </div>
           <div class="col">
             <span class="card-text">
+              {% if plant.watering_freq.lower() == 'average' %}
               <i class="fa-solid fa-droplet" style="color: #74c0fc"></i>
+              <i class="fa-solid fa-droplet" style="color: #74c0fc"></i>
+              {% elif plant.watering_freq.lower() == 'frequent' %}
+              <i class="fa-solid fa-droplet" style="color: #74c0fc"></i>
+              <i class="fa-solid fa-droplet" style="color: #74c0fc"></i>
+              <i class="fa-solid fa-droplet" style="color: #74c0fc"></i>
+              {% elif plant.watering_freq.lower() == 'minimum' %}
+              <i class="fa-solid fa-droplet" style="color: #74c0fc"></i>
+              {% else %}
+              <i class="fa-solid fa-droplet" style="color: #89898b"></i>
+              {% endif %}
               <p>
                 <b>Watering Frequency:</b> {{plant.watering_freq}} watering
                 every {{plant.watering_value}} {{plant.watering_unit}}

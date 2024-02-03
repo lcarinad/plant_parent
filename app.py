@@ -6,6 +6,7 @@ from helpers import fetch_random_plant_data, fetch_search_terms, fetch_plant_det
 from sqlalchemy.exc import IntegrityError, NoResultFound
 from models import db, connect_db, User, Plant, Favorite
 from forms import SignupForm, LoginForm, EditProfileForm
+from flask_bcrypt import Bcrypt
 # import socket
 from confid import key
 
@@ -15,6 +16,7 @@ from confid import key
 CURR_USER_KEY = "curr_user"
 
 app= Flask(__name__)
+bcrypt=Bcrypt()
 
 # mail.init_app(app)
 
@@ -136,22 +138,14 @@ def edit_profile(user_id):
         flash("You must login to edit your profile", "danger")
         return redirect(url_for(user_login))
     try:
-        user=User.query.get(user_id)
-        
-        print(f"*************id:{user.id}")
-        form = EditProfileForm(obj=g.user)
+        user=User.query.get_or_404(user_id)
+        form = EditProfileForm(obj=user)
         if form.validate_on_submit():
-            user = User.authenticate(form.username.data, form.password.data)
-            if user:
-                User.edit_profile(
-                        username=form.username.data,
-                        email=form.email.data,
-                        password=form.password.data,
-                        pref_indoor=form.pref_indoor.data,
-                        pref_sunlight=form.pref_sunlight.data,
-                        pref_watering=form.pref_watering.data,
-                        pref_edible=form.pref_edible.data
-                )
+            auth_check=bcrypt.check_password_hash(g.user.password, form.password.data)
+            if auth_check:
+                user(username=form.username.data, email=form.email.data, pref_indoor=form.pref_indoor.data, pref_sunlight=form.pref_sunlight.data,
+pref_watering=form.pref_watering.data, pref_edible=form.pref_edible.data)
+
                 db.session.commit()
                 flash("You updated your profile!", "success")
                 return redirect(url_for("show_homepage"))
@@ -195,13 +189,12 @@ def search():
     """Handle search query"""
     for arg in args:
         preferences[arg] = request.args.get(arg)
-    results=fetch_search_terms(**preferences)
-
-    if(len(results)==0):
+    plants=fetch_search_terms(**preferences)
+    if(len(plants)==0):
         flash("No results found for that term. Try another term", 'warning')
         return redirect(url_for('show_homepage'))
    
-    return render_template('search.html', results=results, search_term=preferences['q'])
+    return render_template('search.html', plants=plants, search_term=preferences['q'])
 
 @app.route("/details/<int:plant_id>")
 def show_plant(plant_id):

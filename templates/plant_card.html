@@ -4,41 +4,29 @@
     <div class="card" id="{{plant.id}}" style="width: 18rem; height: 21rem">
       {% if plant.default_image.thumbnail %}
       <img
-        class="card-img-top img-thumbnail"
+        class="card-img img-thumbnail border-0"
         src="{{plant.default_image.thumbnail}}"
         alt="picture of {{plant.common_name}}"
       />
       {% else %}
       <img
-        class="card-img-top img-thumbnail"
+        class="card-img-top img-thumbnail border-0"
         src="https://upload.wikimedia.org/wikipedia/commons/d/d1/Image_not_available.png?20210219185637"
-        alt="no image available logo"
+        alt="no image available logo for {{plant.common_name}}"
       />
       {% endif %}
 
       <div class="card-img-overlay">
-        <form class="like" action="">
-          {% if plant.id in session[FAVES] %}
-          <button
-            id="{{plant.id}}"
-            role="submit"
-            class="btn btn-light btn-sm rounded-circle fave-btn faved"
-          >
-            <i class="fa-solid fa-heart"></i>
-          </button>
-
-          {% else %}
-          <button
-            id="{{plant.id}}"
-            role="submit"
-            class="btn btn-light btn-sm rounded-circle fave-btn unfaved"
-          >
-            <i class="fa-solid fa-heart"></i>
-          </button>
-          {% endif %}
-        </form>
+        <button
+          type="button"
+          class="btn btn-light btn-sm rounded-circle z-3 fave-btn unfaved"
+          id="{{plant.id}}"
+          role="submit"
+        >
+          <i class="fa-solid fa-heart"></i>
+        </button>
       </div>
-      <div class="card-body text-center z-3">
+      <div class="card-body text-center z-3 overflow-auto">
         <a href="{{url_for('show_plant', plant_id=plant.id)}}">
           <h5 class="card-title">{{plant.common_name.title()}}</h5></a
         >

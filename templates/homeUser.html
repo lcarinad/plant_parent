@@ -163,43 +163,4 @@ g.user.pref_edible%}
 <h4 class="text-start">our picks based on your preferences:</h4>
 {% else %}
 <h4 class="text-start">our picks:</h4>
-{% endif %}
-<div class="row row-cols-1 row-cols-md-3 g-4">
-  {% for plant in plants %}
-  <div class="col">
-    <div class="card" id="{{plant.id}}" style="width: 18rem; height: 21rem">
-      {% if plant.default_image.thumbnail %}
-      <img
-        class="card-img img-thumbnail border-0"
-        src="{{plant.default_image.thumbnail}}"
-        alt="picture of {{plant.common_name}}"
-      />
-      {% else %}
-      <img
-        class="card-img-top img-thumbnail border-0"
-        src="https://upload.wikimedia.org/wikipedia/commons/d/d1/Image_not_available.png?20210219185637"
-        alt="no image available logo for {{plant.common_name}}"
-      />
-      {% endif %}
-
-      <div class="card-img-overlay">
-        <button
-          type="button"
-          class="btn btn-light btn-sm rounded-circle z-3 fave-btn unfaved"
-          id="{{plant.id}}"
-          role="submit"
-        >
-          <i class="fa-solid fa-heart"></i>
-        </button>
-      </div>
-      <div class="card-body text-center z-3 overflow-auto">
-        <a href="{{url_for('show_plant', plant_id=plant.id)}}">
-          <h5 class="card-title">{{plant.common_name.title()}}</h5></a
-        >
-      </div>
-    </div>
-  </div>
-  {% endfor %}
-</div>
-
-{% endblock %}
+{% endif %} {% include 'plant_card.html' %} {% endblock %}
