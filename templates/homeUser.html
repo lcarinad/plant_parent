@@ -160,7 +160,14 @@ content%}
 <!-- special note: plant.id is being set from api so id refers to api_id -->
 {% if g.user.pref_indoor or g.user.pref_sunlight or g.user.pref_watering or
 g.user.pref_edible%}
-<h4 class="text-start">our picks based on your preferences:</h4>
+<h4 class="text-start">
+  our picks based on your
+  <a
+    class="text-decoration-none"
+    href="{{url_for('edit_profile',user_id=g.user.id)}} "
+    >preferences:</a
+  >
+</h4>
 {% else %}
 <h4 class="text-start">our picks:</h4>
 {% endif %} {% include 'plant_card.html' %} {% endblock %}

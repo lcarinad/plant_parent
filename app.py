@@ -139,12 +139,18 @@ def edit_profile(user_id):
         return redirect(url_for(user_login))
     try:
         user=User.query.get_or_404(user_id)
+        print(f"************User id:{user_id}")
         form = EditProfileForm(obj=user)
         if form.validate_on_submit():
             auth_check=bcrypt.check_password_hash(g.user.password, form.password.data)
             if auth_check:
-                user(username=form.username.data, email=form.email.data, pref_indoor=form.pref_indoor.data, pref_sunlight=form.pref_sunlight.data,
-pref_watering=form.pref_watering.data, pref_edible=form.pref_edible.data)
+                user.username=form.username.data
+                user.email=form.email.data
+                user.pref_indoor=form.pref_indoor.data
+                user.pref_edible=form.pref_edible.data
+                user.pref_sunlight=form.pref_sunlight.data
+                user.pref_watering=form.pref_watering.data
+
 
                 db.session.commit()
                 flash("You updated your profile!", "success")
