@@ -40,18 +40,8 @@ def fetch_search_terms(q=None, indoor=None, edible=None, watering=None, sunlight
 
     response = requests.get("https://perenual.com/api/species-list", params=payload)
     print(f"********************* url:{response.url}")
-    unUsable_results=response.json().get('data',[])
-    usable_results = get_usable_results(unUsable_results)
-    return usable_results
-
-def get_usable_results(unUsable_results):
-    """Return results that have api_id of 1-3000 since those are plants in free api plan."""
-    print("***********Fetching useful results")
-    results=[]
-    for result in unUsable_results:
-        if 'id' in result and result['id'] <=3000:
-            results.append(result)
-    return results
+    all_results=response.json().get('data',[])
+    return all_results
 
 def fetch_plant_details(plant_id):
     """Make get request to return plant details"""

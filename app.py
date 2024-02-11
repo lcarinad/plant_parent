@@ -9,6 +9,7 @@ from forms import SignupForm, LoginForm, EditProfileForm
 from flask_bcrypt import Bcrypt
 # import socket
 from confid import key
+from math import ceil
 
 # mail=Mail()
 
@@ -150,8 +151,6 @@ def edit_profile(user_id):
                 user.pref_edible=form.pref_edible.data
                 user.pref_sunlight=form.pref_sunlight.data
                 user.pref_watering=form.pref_watering.data
-
-
                 db.session.commit()
                 flash("You updated your profile!", "success")
                 return redirect(url_for("show_homepage"))
@@ -214,9 +213,14 @@ def show_plant(plant_id):
 @app.route("/plantlist/<int:p_num>")
 def show_all_plants(p_num=1):
     """Show a list of all plants"""
-    
     plant_data=fetch_search_terms(order='asc', page=p_num)
-    return render_template('list.html', plants=plant_data, page=p_num)
+    # calculate start and end pages for pagination
+    total_plants_count=10104
+    total_pages=ceil(total_plants_count / 30)
+    start_page = max(1, p_num - 1)
+    end_page = min(start_page + 3, total_pages + 1)
+
+    return render_template('list.html', plants=plant_data, page=p_num,start_page=start_page, end_page=end_page, total_pages=total_pages)
 # ********************Favorite Routes**************************************
 @app.route("/add_favorite/<int:plant_id>", methods=["POST"])
 def add_favorite(plant_id):

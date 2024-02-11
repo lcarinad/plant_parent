@@ -41,20 +41,19 @@ class User(db.Model):
         db.session.add(user)
         return user
     
-    @classmethod
-    def edit_profile(cls, username, email, password, pref_indoor, pref_sunlight, pref_watering, pref_edible):
-        """Edit a user profile"""
-        hashed_pwd = bcrypt.generate_password_hash(password).decode('UTF-8')
-        updated_user = User(
-            username=username,
-            email=email,
-            password=hashed_pwd,
-            pref_indoor=pref_indoor,
-            pref_sunlight=pref_sunlight,
-            pref_watering=pref_watering,
-            pref_edible=pref_edible
-        )
-        return updated_user
+    # @classmethod
+    # def edit_profile(cls, username, email, pref_indoor, pref_sunlight, pref_watering, pref_edible):
+    #     """Edit a user profile"""
+
+    #     updated_user = User(
+    #         username=username,
+    #         email=email,
+    #         pref_indoor=pref_indoor,
+    #         pref_sunlight=pref_sunlight,
+    #         pref_watering=pref_watering,
+    #         pref_edible=pref_edible
+    #     )
+    #     return updated_user
     
     @classmethod
     def authenticate(cls, username, password):

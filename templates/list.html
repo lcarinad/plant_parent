@@ -2,53 +2,42 @@
 content%}
 
 <div class="h1 mt-2 text-center">Browse All Plants</div>
+<p class="fst-italic text-info">
+  *Please note that additional information is only available for plants that are
+  hyperlinked.
+</p>
 
 <ul>
-  {% for plant in plants %}
+  {% for plant in plants %} {% if plant.id <= 3000 %}
   <li>
     <a href="{{url_for('show_plant', plant_id=plant.id)}}">
       {{plant.common_name.title()}}</a
     >
   </li>
-
-  {% endfor %}
+  {% else %}
+  <li>{{plant.common_name.title()}}</li>
+  {% endif %} {% endfor %}
 </ul>
+
 <nav aria-label="Page navigation to browse plant list">
   <ul class="pagination">
-    <li class="page-item">
+    <li class="page-item {% if page == 1%} disabled {% endif %}">
       <a
         id="prev"
         class="page-link prev"
-        href="{{url_for('show_all_plants', p_num=page-1|default(1))}}"
+        href="{{url_for('show_all_plants', p_num=1 if page == 1 else page-1)}}"
         >Previous</a
       >
     </li>
+    {% for item in range(start_page, end_page) %}
 
     <li class="page-item">
-      <a
-        id="p1"
-        class="page-link p1"
-        href="{{url_for('show_all_plants', p_num=1)}}"
-        >1</a
+      <a class="page-link" href="{{url_for('show_all_plants', p_num=item)}}"
+        >{{ item }}</a
       >
     </li>
-    <li class="page-item">
-      <a
-        id="p2"
-        class="page-link p2"
-        href="{{url_for('show_all_plants', p_num=2)}}"
-        >2</a
-      >
-    </li>
-    <li class="page-item">
-      <a
-        id="p3"
-        class="page-link p3"
-        href="{{url_for('show_all_plants', p_num=3)}}"
-        >3</a
-      >
-    </li>
-    <li class="page-item">
+    {% endfor %}
+    <li class="page-item {% if page == total_pages %} disabled {% endif %}">
       <a
         id="next"
         class="page-link next"
