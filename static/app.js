@@ -1,10 +1,12 @@
 let $faveBtn = $(".fave-btn");
 let url = "http://127.0.0.1:5000";
+const notificationDiv = $("#alert");
+
+notificationDiv.hide();
 
 $faveBtn.on("click", async function (e) {
   e.preventDefault();
   try {
-    console.log($(this));
     if ($(this).hasClass("faved")) {
       await delFave($(this));
     } else {
@@ -20,10 +22,8 @@ async function delFave(plant) {
   try {
     let delRes = await axios.post(`${url}/delete_favorite/${plant_id}`);
     if (delRes.status === 200) {
-      console.log(delRes);
       plant.toggleClass("unfaved").removeClass("faved");
       let url = $(location)[0].href;
-      console.log(url);
       if (url.includes("favorites")) {
         plant.closest(".card").remove();
       }
@@ -41,18 +41,22 @@ async function addFave(plant) {
     let addRes = await axios.post(`${url}/add_favorite/${plant_id}`);
     if (addRes.status === 201) {
       plant.toggleClass("faved").removeClass("unfaved");
-      console.log(addRes);
     } else {
-      alert("You must login to favorite a plant!");
-      handleUnexpectedStatus(addRes);
+      // alert("You must login to favorite a plant!");
+      // handleUnexpectedStatus(addRes);
+      // window.location.href = "/";
+      displayNotification("You must login or register to favorite a plant!");
     }
   } catch (error) {
     handleError(error);
   }
 }
-
+function displayNotification(message) {
+  notificationDiv.text(message);
+  notificationDiv.show();
+}
 function handleUnexpectedStatus(req) {
-  console.log(`Unexpected status code. Response:`, req);
+  console.error(`Unexpected status code. Response:`, req);
 }
 
 function handleError(error) {

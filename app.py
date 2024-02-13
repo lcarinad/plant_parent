@@ -1,42 +1,23 @@
 import os 
 
 from flask import Flask, render_template, flash, redirect, g, session, url_for, request, jsonify
-# from flask_mailman import Mail, EmailMessage
 from helpers import fetch_random_plant_data, fetch_search_terms, fetch_plant_details, get_logout_msg, add_plant, get_random_plants
 from sqlalchemy.exc import IntegrityError, NoResultFound
 from models import db, connect_db, User, Plant, Favorite
 from forms import SignupForm, LoginForm, EditProfileForm
 from flask_bcrypt import Bcrypt
-# import socket
 from confid import key
 from math import ceil
-
-# mail=Mail()
-
 
 CURR_USER_KEY = "curr_user"
 
 app= Flask(__name__)
 bcrypt=Bcrypt()
 
-# mail.init_app(app)
-
-
-app.config['SQLALCHEMY_DATABASE_URI']=(os.environ.get('DATABASE_URL','postgresql:///plant_db'))
-                                                      
+app.config['SQLALCHEMY_DATABASE_URI']=(os.environ.get('DATABASE_URL','postgresql:///plant_db'))                                                 
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_ECHO'] = False
 app.config['SECRET_KEY']=os.environ.get('SECRET_KEY','oh-so-secret')
-# app.config["MAIL_SERVER"]="smtp.gmail.com"
-# app.config["MAIL_PORT"]=465
-# app.config["MAIL_USERNAME"]="delagomusic7305@gmail.com"
-# app.config["MAIL_PASSWORD"]="klafladsjldafadlk12"
-# app.config["MAIL_USE_TLS"]=False
-# app.config["MAIL_USE_SSL"]=True
-
-# Gmail SMTP port: 465 (SSL)/587 (TLS)
-
-
 
 connect_db(app)
 app.app_context().push()
@@ -61,24 +42,6 @@ def logout_user():
     """Logout user."""
     if CURR_USER_KEY in session:
         del session[CURR_USER_KEY]
-
-# @app.route('/mail')
-# def index():
-#     timeout = 10
-#     try:
-#         socket.create_connection(("smtp.gmail.com", 465), timeout)
-#         msg = EmailMessage("Here's the Title", "Body of the email", "delagomusic7305@gmail.com", ["lcarinad@gmail.com"])
-#         msg.send()
-#         return '<h1>sent email...</h1>'
-#     except socket.timeout:
-#         return '<h1>Connection timed out. Unable to establish a connection.</h1>'
-#     except Exception as e:
-#         # Handle other connection errors
-#         return f'<h1>Error occurred: {e}</h1>'
-
-
-
-
 
 @app.route("/signup",methods=['POST', 'GET'])
 def signup():
@@ -140,7 +103,6 @@ def edit_profile(user_id):
         return redirect(url_for(user_login))
     try:
         user=User.query.get_or_404(user_id)
-        print(f"************User id:{user_id}")
         form = EditProfileForm(obj=user)
         if form.validate_on_submit():
             auth_check=bcrypt.check_password_hash(g.user.password, form.password.data)
@@ -226,8 +188,7 @@ def show_all_plants(p_num=1):
 def add_favorite(plant_id):
     """Add plant to favorites list"""
     if not g.user:
-        flash("You must login to favorite a plant.", "danger")
-        return redirect(url_for("user_login"))
+        return jsonify({"error": "You must login to favorite a plant."})
     try:
         plant= Plant.query.filter_by(api_id=plant_id).first()
 
@@ -250,8 +211,8 @@ def add_favorite(plant_id):
 def delete_favorite(plant_id):
     """Remove plant from users favorites. Plant_id is api id."""
     if not g.user:
-        flash("Unauthorized access, please login.", "danger")
-        return redirect(url_for("user_login")) 
+        return jsonify({"error": "You must login to favorite a plant."})
+
     try:
         plant= Plant.query.filter(Plant.api_id == plant_id).first()
         faved_plant=Favorite.query.filter(Favorite.user_id==g.user.id, Favorite.plant_id==plant.id).one()
