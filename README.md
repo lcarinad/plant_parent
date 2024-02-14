@@ -1,7 +1,7 @@
 # Plant Parent🪴
 
 Find plants that are right for your lifestyle and get helpful tips to keep them alive!
-
+# Plant Parent is [deployed on Render](https://plant-parent.onrender.com/)
 ## Features
 
 ### A logged-out user can:
@@ -35,7 +35,7 @@ Plant Parent is run by the [Perenual](https://perenual.com/docs/api) API.
 
 ## Tech Stack
 
-- Frontend: HTML, CSS, JavaScript, styled with Bootstrap. Theme is ‘minty’ from bootswatch
+- Frontend: HTML, CSS, JavaScript, styled with Bootstrap. The theme is ‘minty’ from bootswatch
 - Backend: Python, Flask, SQLAlchemy, PostgreSQL, WTForms
 
 ### Important Note
