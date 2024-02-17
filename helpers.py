@@ -9,9 +9,9 @@ def fetch_random_plant_data():
     random_page=get_random_page()
     payload={'key':key, 'page':random_page}
     response = requests.get(f"https://perenual.com/api/species-list", params=payload)
-    all_plants=response.json().get('data',[])
-
-    random_plants=get_random_plants(all_plants)
+    all_plants_results=response.json().get('data',[])
+    usable_results=fetch_usable_plant_data(all_plants_results)
+    random_plants=get_random_plants(usable_results)
     return random_plants
 
 
@@ -28,20 +28,21 @@ def get_random_page():
 
 def fetch_search_terms(q=None, indoor=None, edible=None, watering=None, sunlight=None,order=None, page=None):
     """Make get request to return search terms"""
-    if edible == True:
-        edible=1
-    else:
-        edible=None
-    if indoor == True:
-        indoor=1
-    else:
-        indoor=None
     payload={'key':key,'q':q,'indoor':indoor,'edible':edible,'watering':watering, 'sunlight':sunlight,'order':order, 'page':page }
-
+    print(f"********payload:{payload}")
     response = requests.get("https://perenual.com/api/species-list", params=payload)
-    print(f"********************* url:{response.url}")
-    all_results=response.json().get('data',[])
-    return all_results
+    all_plants_results=response.json().get('data',[])
+    usable_results=fetch_usable_plant_data(all_plants_results)
+    return usable_results
+
+def fetch_usable_plant_data(all_results):
+    """Fetch only plants that are available on free api subscription"""
+    results=[]
+    for result in all_results:
+        if 'id' in result and result['id'] <= 3000:
+            results.append(result)
+    return results  
+
 
 def fetch_plant_details(plant_id):
     """Make get request to return plant details"""

@@ -22,8 +22,8 @@ app.config['SECRET_KEY']=os.environ.get('SECRET_KEY','oh-so-secret')
 connect_db(app)
 app.app_context().push()
 
-preferences={}
-args=["q", "indoor", "edible", "watering", "sunlight"]
+search_filter_options=["q", "indoor", "edible", "watering", "sunlight"]
+user_selected_search_filters={}
 ################################################################
 #user signup/login/logout
 @app.before_request
@@ -58,7 +58,6 @@ def signup():
             flash ("Registration successful", 'success')
 
             add_user_to_sess(user)
-            add_user_to_global()
             return redirect("/")
         
         except IntegrityError as e:
@@ -122,7 +121,7 @@ def edit_profile(user_id):
         flash(f"An error occurred: {e}", "danger")
         return redirect(url_for("show_homepage"))
     return render_template("edit.html", form=form, user_id=g.user.id)
-####################################
+##########################################################################################
 @app.route("/")
 def show_homepage():
     """Show landing page"""
@@ -130,20 +129,24 @@ def show_homepage():
           return render_template("homeanon.html")
     
     if g.user:
-        preferences={
+        user_selected_search_filters={
             "indoor": g.user.pref_indoor,
             "edible": g.user.pref_edible,
             "watering": g.user.pref_watering,
             "sunlight": g.user.pref_sunlight
         }
-        user=User.query.get(g.user.id)
 
-        if any(preferences.values()):
-            pref_plants = fetch_search_terms(**preferences)
+        # check if user has saved search preferences
+        if any(user_selected_search_filters.values()):
+            user_selected_search_filters["indoor"] = 1 if user_selected_search_filters["indoor"] else None
+            user_selected_search_filters["edible"] = 1 if user_selected_search_filters["edible"] else None
+        # if they have saved search preferences, show plants on homepage that match saved search preferences
+            pref_plants = fetch_search_terms(**user_selected_search_filters)
 
             if(len(pref_plants)==0):              
                 flash("No plants were found matches your preferences.  Try different filters.", 'warning')
-                return redirect(url_for("edit_profile", user_id=g.user.id))            
+                return redirect(url_for("edit_profile", user_id=g.user.id))       
+        # if user doesn't have saved search preferences, show random plants on homepage
             plants=get_random_plants(pref_plants)
 
             return render_template('homeUser.html', plants=plants)
@@ -154,14 +157,14 @@ def show_homepage():
 @app.route("/search")
 def search():
     """Handle search query"""
-    for arg in args:
-        preferences[arg] = request.args.get(arg)
-    plants=fetch_search_terms(**preferences)
+    for search_filter in search_filter_options:
+        user_selected_search_filters[search_filter] = request.args.get(search_filter)
+    plants=fetch_search_terms(**user_selected_search_filters)
     if(len(plants)==0):
         flash("No results found for that term. Try another term", 'warning')
         return redirect(url_for('show_homepage'))
    
-    return render_template('search.html', plants=plants, search_term=preferences['q'])
+    return render_template('search.html', plants=plants, search_term=user_selected_search_filters['q'])
 
 @app.route("/details/<int:plant_id>")
 def show_plant(plant_id):
