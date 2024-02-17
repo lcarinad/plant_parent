@@ -1,7 +1,7 @@
 import os 
 
 from flask import Flask, render_template, flash, redirect, g, session, url_for, request, jsonify
-from helpers import fetch_random_plant_data, fetch_search_terms, fetch_plant_details, get_logout_msg, add_plant, get_random_plants
+from helpers import fetch_random_plant_data, fetch_search_terms, fetch_plant_details, get_logout_msg, add_plant, get_random_plants, get_total_plants_count,get_total_pages_count
 from sqlalchemy.exc import IntegrityError, NoResultFound
 from models import db, connect_db, User, Plant, Favorite
 from forms import SignupForm, LoginForm, EditProfileForm
@@ -22,6 +22,9 @@ app.config['SECRET_KEY']=os.environ.get('SECRET_KEY','oh-so-secret')
 connect_db(app)
 app.app_context().push()
 
+TOTAL_PLANTS_COUNT=get_total_plants_count()
+TOTAL_PLANT_PAGES=get_total_pages_count()
+
 search_filter_options=["q", "indoor", "edible", "watering", "sunlight"]
 user_selected_search_filters={}
 ################################################################
@@ -34,7 +37,7 @@ def add_user_to_global():
     else:
         g.user = None
 
-def add_user_to_sess(user):
+def add_user_to_session(user):
     """Add login user to session"""
     session[CURR_USER_KEY]=user.id
 
@@ -57,7 +60,7 @@ def signup():
             db.session.commit()
             flash ("Registration successful", 'success')
 
-            add_user_to_sess(user)
+            add_user_to_session(user)
             return redirect("/")
         
         except IntegrityError as e:
@@ -81,7 +84,7 @@ def user_login():
             user = User.authenticate(form.username.data, form.password.data)
 
             if user:
-                add_user_to_sess(user)
+                add_user_to_session(user)
                 return redirect('/')         
             flash("Password or username incorrect.", 'danger')
 
@@ -140,12 +143,14 @@ def show_homepage():
         if any(user_selected_search_filters.values()):
             user_selected_search_filters["indoor"] = 1 if user_selected_search_filters["indoor"] else None
             user_selected_search_filters["edible"] = 1 if user_selected_search_filters["edible"] else None
-        # if they have saved search preferences, show plants on homepage that match saved search preferences
+
+        # if user has saved search preferences, show plants on homepage that match saved search preferences
             pref_plants = fetch_search_terms(**user_selected_search_filters)
 
             if(len(pref_plants)==0):              
                 flash("No plants were found matches your preferences.  Try different filters.", 'warning')
                 return redirect(url_for("edit_profile", user_id=g.user.id))       
+            
         # if user doesn't have saved search preferences, show random plants on homepage
             plants=get_random_plants(pref_plants)
 
@@ -175,18 +180,18 @@ def show_plant(plant_id):
         return redirect(url_for('search'))
     return render_template('plant.html', plant=plant_data)
 
-@app.route("/plantlist/<int:p_num>")
-def show_all_plants(p_num=1):
+@app.route("/plantlist/<int:page_num>")
+def show_all_plants(page_num=1):
     """Show a list of all plants"""
-    plant_data=fetch_search_terms(order='asc', page=p_num)
+    plant_data=fetch_search_terms(order='asc', page=page_num)
     # calculate start and end pages for pagination
-    total_plants_count=10104
-    total_pages=ceil(total_plants_count / 30)
-    start_page = max(1, p_num - 1)
+    # total_plants_count=TOTAL_PLANTS_COUNT
+    total_pages=TOTAL_PLANT_PAGES
+    start_page = max(1, page_num - 1)
     end_page = min(start_page + 3, total_pages + 1)
 
-    return render_template('list.html', plants=plant_data, page=p_num,start_page=start_page, end_page=end_page, total_pages=total_pages)
-# ********************Favorite Routes**************************************
+    return render_template('list.html', plants=plant_data, page=page_num,start_page=start_page, end_page=end_page, total_pages=total_pages)
+# ********************Favorite Routes*************************
 @app.route("/add_favorite/<int:plant_id>", methods=["POST"])
 def add_favorite(plant_id):
     """Add plant to favorites list"""

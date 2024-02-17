@@ -41,20 +41,6 @@ class User(db.Model):
         db.session.add(user)
         return user
     
-    # @classmethod
-    # def edit_profile(cls, username, email, pref_indoor, pref_sunlight, pref_watering, pref_edible):
-    #     """Edit a user profile"""
-
-    #     updated_user = User(
-    #         username=username,
-    #         email=email,
-    #         pref_indoor=pref_indoor,
-    #         pref_sunlight=pref_sunlight,
-    #         pref_watering=pref_watering,
-    #         pref_edible=pref_edible
-    #     )
-    #     return updated_user
-    
     @classmethod
     def authenticate(cls, username, password):
         """Find user with un and hashed pwd. Returns user object if username and hashed pwd are found, else returns False."""

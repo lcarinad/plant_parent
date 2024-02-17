@@ -3,6 +3,19 @@ from random import sample, randint
 from confid import key
 from models import Plant
 
+def get_total_plants_count():
+    """Make request to perenual api to fetch total number of plants in api"""
+    payload={'key':key}
+    response = requests.get(f"https://perenual.com/api/species-list", params=payload)  
+    total_plants_num=response.json().get('per_page')
+    return total_plants_num
+
+def get_total_pages_count():
+    """Make request to perenual api to fetch total number of pages in api"""
+    payload={'key':key}
+    response = requests.get(f"https://perenual.com/api/species-list", params=payload)  
+    total_pages_num=response.json().get('last_page')
+    return total_pages_num
 
 def fetch_random_plant_data():
     """Make get request to perenual api"""
@@ -29,11 +42,11 @@ def get_random_page():
 def fetch_search_terms(q=None, indoor=None, edible=None, watering=None, sunlight=None,order=None, page=None):
     """Make get request to return search terms"""
     payload={'key':key,'q':q,'indoor':indoor,'edible':edible,'watering':watering, 'sunlight':sunlight,'order':order, 'page':page }
-    print(f"********payload:{payload}")
     response = requests.get("https://perenual.com/api/species-list", params=payload)
     all_plants_results=response.json().get('data',[])
     usable_results=fetch_usable_plant_data(all_plants_results)
-    return usable_results
+    unique_results=fetch_unique_results(usable_results)
+    return unique_results
 
 def fetch_usable_plant_data(all_results):
     """Fetch only plants that are available on free api subscription"""
@@ -43,6 +56,15 @@ def fetch_usable_plant_data(all_results):
             results.append(result)
     return results  
 
+def fetch_unique_results(usable_results):
+    """Remove duplicate plant results from the usable results returned from the perenual api"""
+    unique_plant_names=set()
+    unique_plant_results=[]
+    for result in usable_results:
+        if result['common_name'] not in unique_plant_names:
+            unique_plant_results.append(result)
+            unique_plant_names.add(result['common_name'])
+    return unique_plant_results
 
 def fetch_plant_details(plant_id):
     """Make get request to return plant details"""

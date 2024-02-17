@@ -25,14 +25,14 @@ content%}
       <a
         id="prev"
         class="page-link prev"
-        href="{{url_for('show_all_plants', p_num=1 if page == 1 else page-1)}}"
+        href="{{url_for('show_all_plants', page_num=1 if page == 1 else page-1)}}"
         >Previous</a
       >
     </li>
     {% for item in range(start_page, end_page) %}
 
     <li class="page-item">
-      <a class="page-link" href="{{url_for('show_all_plants', p_num=item)}}"
+      <a class="page-link" href="{{url_for('show_all_plants', page_num=item)}}"
         >{{ item }}</a
       >
     </li>
@@ -41,7 +41,7 @@ content%}
       <a
         id="next"
         class="page-link next"
-        href="{{url_for('show_all_plants', p_num=page+1)}}"
+        href="{{url_for('show_all_plants', page_num=page+1)}}"
         >Next</a
       >
     </li>
