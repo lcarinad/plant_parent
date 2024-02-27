@@ -185,7 +185,6 @@ def show_all_plants(page_num=1):
     """Show a list of all plants"""
     plant_data=fetch_search_terms(order='asc', page=page_num)
     # calculate start and end pages for pagination
-    # total_plants_count=TOTAL_PLANTS_COUNT
     total_pages=TOTAL_PLANT_PAGES
     start_page = max(1, page_num - 1)
     end_page = min(start_page + 3, total_pages + 1)

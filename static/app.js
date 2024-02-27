@@ -3,6 +3,14 @@ const notificationDiv = $("#alert");
 
 notificationDiv.hide();
 
+$(document).ready(function () {
+  $("#loader").show();
+});
+
+$(window).on("load", function () {
+  $("#loader").hide();
+});
+
 $faveBtn.on("click", async function (e) {
   e.preventDefault();
   try {

@@ -27,7 +27,6 @@ def fetch_random_plant_data():
     random_plants=get_random_plants(usable_results)
     return random_plants
 
-
 def get_random_plants(all_plants):
     """Fetch 8 random plants"""
     list_size=min(len(all_plants),8)
