@@ -4,10 +4,12 @@ const notificationDiv = $("#alert");
 notificationDiv.hide();
 
 $(document).ready(function () {
+  console.log("page is loading");
   $("#loader").show();
 });
 
 $(window).on("load", function () {
+  console.log("page has finished loading");
   $("#loader").hide();
 });
 
